@@ -1,6 +1,6 @@
 #include "raylib.h"
 
-class Platform{
+class Wall{
     public:  
     // variable that represents the platforms width and height
     float width;
@@ -11,7 +11,7 @@ class Platform{
     Rectangle rec;
     
     //Parametarized constructor for the platform class
-    Platform(float posX, float posY, float width, float height){
+    Wall(float posX, float posY, float width, float height){
         //sets the instance variables to the given paramaters
         this->width = width;
         this->height = height;
