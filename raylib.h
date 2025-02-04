@@ -201,6 +201,10 @@ Rectangle
     #define RL_BOOL_TYPE
 #endif
 
+
+float lerp(float start, float end, float t){
+    return start + (end - start) * t;
+}
 // Vector2, 2 components
 typedef struct Vector2 {
     float x;                // Vector x component
