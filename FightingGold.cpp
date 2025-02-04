@@ -75,6 +75,7 @@ int main(void)
     InitWindow(screenWidth, screenHeight, " |Fight Game| "); //initilisation of the window 
 
     // NOTE: Textures MUST be loaded after Window initialization (OpenGL context is required)
+    
     // a clear teture to make things transperent if needed
     Texture2D Clear = LoadTexture("Sprites/Icons/Clear.png");
     //player sprite
@@ -88,10 +89,7 @@ int main(void)
     walls.push_back(wall2);
     
     std::cout << "\n(WALLS: " <<  walls.size() << ")\n";
-    
-
-    
-    
+        
     Spell fireBall('a', 10, 15, 'f', "Fire Ball", 'p', 20, 30, "Sprites/Icons/Flame.png");// creates a spell
     Spell waterBall('a', 10, 15, 'w', "Water Ball", 'p', 20, 30, "Sprites/Icons/WaterDrop.png");// creates a spell
     Spell lightningBolt('a', 20, 20, 'l', "Lightning Bolt", 'b', 100, 60, "Sprites/Icons/LightningBolt.png");// creates a spell
@@ -424,6 +422,7 @@ int main(void)
 
 Vector2 movementRequestS(char axis, int amount, Vector2 position){
     Vector2 result = position;
+    bool colD = false;
     for(int i = 0; i < walls.size(); i++){
            //returns a Vector2 value for the players new position given the parameters and collisions (x value)
         if(axis == 'X' || axis == 'x'){
@@ -434,10 +433,7 @@ Vector2 movementRequestS(char axis, int amount, Vector2 position){
                      result.x = walls[i].position.x + walls[i].width;
                 }
                 //return the new player position with collision detected
-                return result;
-           }else{
-               //accept the request for movement with no detected collisions
-               return {position.x + amount, position.y};
+                colD = true;
            }
            //returns a Vector2 value for the players new position given the parameters and collisions (y value)
         }else if(axis == 'y' || axis == 'Y'){
@@ -448,12 +444,17 @@ Vector2 movementRequestS(char axis, int amount, Vector2 position){
                 }else{
                     result.y = walls[i].position.y + walls[i].height;
                 }
-                return result;
-           }else{
-               
-               return {position.x, position.y + amount};
+                colD = true;
            }
         }
+       }
+       
+       if(colD){
+           return result;
+       }else if(axis == 'x' || axis == 'X'){
+           return {position.x + amount, position.y};
+       }else{
+           return {position.x, position.y + amount};
        }
        //return statement that does nothing to make the compiler happy
        return {0,0};
