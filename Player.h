@@ -13,8 +13,8 @@ class Player{
     
     public:
     // player attributes *scale together to maintan the apperance of the player square*
-    float width = 75;
-    float height = 150;
+    float width = 80;
+    float height = 160;
     Rectangle Rec; //Rectangle struct used for the DrawRectanglePro function
     
     int maxHealth;
@@ -25,6 +25,10 @@ class Player{
     
     int maxStamina;
     int stamina;
+    
+    int level = 1;
+    int EXP = 0;
+    int nextLevel = 200; 
     
     typedef struct Stats{
         int mana;
@@ -70,24 +74,46 @@ class Player{
         if(health > maxHealth) health = maxHealth;
         if(health < 0) health = 0;
     }
+    void updateMana(int amount){
+        float update;
+        if(amount < 0) update = (amount*-1) - (((float)stats.mana/105)*(amount*-1));
+        else update = -amount;
+        mana -= update;
+        if(mana > maxMana) mana = maxMana;
+        if(mana < 0) mana = 0;
+    }
     
     void updateStat(int amount, char stat){
         if(stat == 'm'){
-            stats.mana += 1;
+            stats.mana += amount;
             maxMana = 100 + (stats.mana * 10);
         }else if(stat == 'e'){
-            stats.endurence += 1;
+            stats.endurence += amount;
             maxStamina = 100 + (stats.endurence * 10);
         }else if(stat == 'a'){
-            stats.agility += 1;
+            stats.agility += amount;
         }else if(stat == 's'){
-            stats.skill += 1;
+            stats.skill += amount;
         }else if(stat == 'p'){
-            stats.power += 1;
+            stats.power += amount;
         }else if(stat == 'v'){
-            stats.vitality += 1;
+            stats.vitality += amount;
             maxHealth = 100 + (stats.vitality * 10);
         }
     }
     
+    void exp(int amount){
+        if(EXP > nextLevel){
+            EXP -= nextLevel;
+            level += 1;
+            nextLevel *= 1.5;
+            updateStat(1, 'm');
+            updateStat(1, 'e');
+            updateStat(1, 'a');
+            updateStat(1, 's');
+            updateStat(1, 'p');
+            updateStat(1, 'v');
+        }else EXP += amount;
+        
+    }
 };

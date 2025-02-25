@@ -9,6 +9,7 @@ class Slot{
     Spell *spell = NULL;
     std::string image;
     Texture2D texture;
+    int thickness = 2;
     Slot(Vector2 position, int width, int height, Spell *spell){
         this->position = position;
         this->width = width;
