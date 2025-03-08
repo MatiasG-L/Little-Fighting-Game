@@ -62,6 +62,7 @@ std::vector<Enemy> enemies;
 
 // used to render the level or main menu
 bool inventoryUI = false;
+bool stat = false;
 
 
 
@@ -121,15 +122,21 @@ int main(void)
     
     std::cout << "\n(WALLS: " <<  walls.size() << ")\n";
         
-    Spell fireBall('a', 30, 15, 'f', "Fire Ball", 'p', 20, 500, "Sprites/Icons/Flame.png", "Sprites/Objects/FireBall.png");// creates a spell
-    Spell waterBall('a', 30, 15, 'w', "Water Ball", 'p', 20, 600, "Sprites/Icons/WaterDrop.png", "Sprites/Objects/WaterBall.png");// creates a spell
-    Spell lightningBolt('a', 60, 50, 'l', "Lightning Bolt", 'b', 100, 1200, "Sprites/Icons/LightningBolt.png", "Sprites/Icons/Clear.png");// creates a spell
-    Spell Spike('a', 40, 60, 'l', "Earth Spike", 'p', 40, 800, "Sprites/Icons/Spike.png", "Sprites/Objects/RockSpike.png");// creates a spell
+    Spell fireBall('a', 20, 25, 'f', "Fire Ball", 'p', 20, 500, "Sprites/Icons/Flame.png", "Sprites/Objects/FireBall.png");// creates a spell
+    Spell waterBall('a', 20, 25, 'w', "Water Ball", 'p', 20, 600, "Sprites/Icons/WaterDrop.png", "Sprites/Objects/WaterBall.png");// creates a spell
+    Spell lightningBolt('a', 30, 45, 'l', "Lightning Bolt", 'b', 70, 1000, "Sprites/Icons/LightningBolt.png", "Sprites/Objects/LightingBolt.png");// creates a spell
+    Spell Spike('a', 90, 50, 's', "Earth Spike", 'p', 40, 800, "Sprites/Icons/Spike.png", "Sprites/Objects/RockSpike.png");// creates a spell
+    Spell lightningSpear('a', 150, 60, 'l', "Lightning Spear", 'b',/*speed*/ 100, 1200, "Sprites/Icons/LightningSpear.png", "Sprites/Objects/LightningSpear.png");// creates a spell
+    Spell waterSpear('a', 30, 70, 'w', "Water Spear", 'b',/*speed*/ 50, 900, "Sprites/Icons/WaterSpear.png", "Sprites/Objects/WaterSpear.png");// creates a spell
+    Spell rock('a', 20, 30, 's', "Rock", 'b',/*speed*/ 20, 700, "Sprites/Icons/Rock.png", "Sprites/Objects/Rock.png");// creates a spell
     
     Slot slot1({0, 0}, 100, 100, &fireBall);
     Slot slot2({0, 0}, 100, 100, &waterBall);
     Slot slot3({250, 250}, 100, 100, &lightningBolt);
     Slot slot4({250, 250}, 100, 100, &Spike);
+    Slot slot5({250, 250}, 100, 100, &lightningSpear);
+    Slot slot6({250, 250}, 100, 100, &rock);
+    Slot slot7({250, 250}, 100, 100, &waterSpear);
      inventory inventory;// created an instance for the inventory
      struct inventory hotBar;//created an instance for the hotbar
      
@@ -146,10 +153,20 @@ int main(void)
      inventory.spells.push_back(slot1);// adds the created spell to the spells vector in the inventory
      inventory.spells.push_back(slot2);// adds the created spell to the spells vector in the inventory
      inventory.spells.push_back(slot3);// adds the created spell to the spells vector in the inventory
-      inventory.spells.push_back(slot4);// adds the created spell to the spells vector in the inventory
+     inventory.spells.push_back(slot4);// adds the created spell to the spells vector in the inventory
+     inventory.spells.push_back(slot5);// adds the created spell to the spells vector in the inventory
+     inventory.spells.push_back(slot6);// adds the created spell to the spells vector in the inventory
+     inventory.spells.push_back(slot7);// adds the created spell to the spells vector in the inventory
+    
+     
     
      Enemy dum({300, 700}, 150, 150, 300, 300, 0, 50, Dummy, 'f');
+     Enemy dum1({500, 900}, 150, 150, 300, 300, 0, 50, Dummy, 'f');
+     Enemy dum2({0, 100}, 150, 150, 300, 300, 0, 50, Dummy, 'w');
+     
      enemies.push_back(dum);
+     enemies.push_back(dum1);
+     enemies.push_back(dum2);
 
     for(int i = 0; i<inventory.spells.size(); i++){
         inventory.spells[i].spell->texture.width = 100;
@@ -187,10 +204,10 @@ int main(void)
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         
-        if(timerRegenMana < 0.05){
+        if(timerRegenMana < 0.01){
             timerRegenMana += GetFrameTime();
         }else if(player.mana < player.maxMana){
-            player.mana += 1;
+            player.mana += 2;
             timerRegenMana = 0;
         }
         
@@ -198,12 +215,19 @@ int main(void)
         for(int i = 0; i < projectiles.size();i++){
             for(int j = 0; j < enemies.size(); j++){
                 if(CheckCollisionRecs({projectiles[i].position.x, projectiles[i].position.y, projectiles[i].width,    projectiles[i].height},{enemies[j].position.x, enemies[j].position.y, enemies[j].width, enemies[j].height})){
+                    
+                    enemies[j].position = vectorAddition(&enemies[j].position, &projectiles[i].velocity);
+                    enemies[j].damage(projectiles[i].power * (1 + (float)player.stats.power * 0.1), projectiles[i].SPfactor);
                     projectiles.erase(projectiles.begin() + i);
-                    enemies[i].position = vectorAddition(&enemies[i].position, &(projectiles[i].velocity * 10));
+                    i--;
+                }
+                if(enemies[j].health <= 0){
+                    enemies.erase(enemies.begin() + j);
+                    j--;
                 }
             }
         }
-        
+       
        //stamina regeneration
         if(timerRegen < 0.1){
             timerRegen += GetFrameTime();
@@ -376,7 +400,8 @@ int main(void)
                 
                 //draws the enemies
                 for(int i = 0; i < enemies.size(); i++){
-                    DrawRectangle(enemies[i].position.x , enemies[i].position.y - 30, (enemies[i].health/enemies[i].maxHealth)*enemies[i].width, 20, MAROON);
+                    DrawRectangle(enemies[i].position.x , enemies[i].position.y - 30, ((
+                    (float)enemies[i].health/(float)enemies[i].maxHealth)*enemies[i].width), 20, MAROON);
                     DrawTextureEx(enemies[i].sprite, {enemies[i].position.x, enemies[i].position.y}, 0, 9.5, WHITE);
                     DrawRectangleLines(enemies[i].position.x, enemies[i].position.y, enemies[i].width, enemies[i].height, BLACK);
                 }
@@ -435,6 +460,10 @@ int main(void)
                 DrawRectangle(435, 170, 200, 50, GRAY);
                 DrawText("stats", 490 ,180, 30, BLACK);
                 
+                if(CheckCollisionPointRec({GetMouseX(), GetMouseY()}, {435, 170, 200, 50}) && IsMouseButtonPressed(0)) stat = !stat;
+                
+                
+                if(!stat){
                 
                 int posX = 275;
                 int posY = 275;
@@ -460,8 +489,8 @@ int main(void)
                     DrawRectangleLinesEx({inventory.spells[i].position.x, inventory.spells[i].position.y, 100, 100}, inventory.spells[i].thickness, BLACK); 
                     posX += 150;
                     if (posX > 250+(150*8)){
-                        posX = 250;
-                        posY -= 250;
+                        posX = 275;
+                        posY += 150;
                     }
                    if(IsMouseButtonReleased(0) && inventoryDragS){
                    
@@ -497,6 +526,44 @@ int main(void)
                         inventoryDragS = false;
                 }
                 
+           }else{
+               
+               DrawText("Mana: ", 275, 275, 30, BLACK);
+               DrawRectangle(380, 275, 200, 30, DARKGRAY);
+               DrawRectangle(380, 275, (((float)player.stats.mana)/100) * 200, 30, DARKGREEN);
+               DrawRectangleLinesEx({380, 275, 200, 30}, 2,BLACK);
+               
+               DrawText("Endurance: ", 275, 325, 30, BLACK);
+               DrawRectangle(470, 325, 200, 30, DARKGRAY);
+               DrawRectangle(470, 325, (((float)player.stats.endurence)/100) * 200, 30, DARKGREEN);
+               DrawRectangleLinesEx({470, 325, 200, 30}, 2,BLACK);
+               
+               DrawText("Agility: ", 275, 375, 30, BLACK);
+               DrawRectangle(400, 375, 200, 30, DARKGRAY);
+               DrawRectangle(400, 375, (((float)player.stats.agility)/100) * 200, 30, DARKGREEN);
+               DrawRectangleLinesEx({400, 375, 200, 30}, 2,BLACK);
+               
+               DrawText("Skill: ", 275, 425, 30, BLACK);
+               DrawRectangle(350, 425, 200, 30, DARKGRAY);
+               DrawRectangle(350, 425, (((float)player.stats.skill)/100) * 200, 30, DARKGREEN);
+               DrawRectangleLinesEx({350, 425, 200, 30}, 2,BLACK);
+               
+               DrawText("Power: ", 275, 475, 30, BLACK);
+               DrawRectangle(390, 475, 200, 30, DARKGRAY);
+               DrawRectangle(390, 475, (((float)player.stats.power)/100) * 200, 30, DARKGREEN);
+               DrawRectangleLinesEx({390, 475, 200, 30}, 2,BLACK);
+               
+               DrawText("Vitality: ", 275, 525, 30, BLACK);
+               DrawRectangle(400, 525, 200, 30, DARKGRAY);
+               DrawRectangle(400, 525, (((float)player.stats.vitality)/100) * 200, 30, DARKGREEN);
+               DrawRectangleLinesEx({400, 525, 200, 30}, 2,BLACK);
+               
+               
+               
+              // DrawText("inventory", 250 ,180, 30, BLACK);
+               
+           }
+           
            }
            
            //spell slots (hotbar) and draging

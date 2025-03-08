@@ -87,19 +87,26 @@ class Player{
         if(stat == 'm'){
             stats.mana += amount;
             maxMana = 100 + (stats.mana * 10);
+            if(stats.mana > 100) stats.mana = 100;
         }else if(stat == 'e'){
             stats.endurence += amount;
             maxStamina = 100 + (stats.endurence * 10);
+            if(stats.endurence > 100) stats.endurence = 100;
         }else if(stat == 'a'){
             stats.agility += amount;
+            if(stats.agility > 100) stats.agility = 100;
         }else if(stat == 's'){
             stats.skill += amount;
+            if(stats.skill > 100) stats.skill = 100;
         }else if(stat == 'p'){
             stats.power += amount;
+            if(stats.power > 100) stats.power = 100;
         }else if(stat == 'v'){
             stats.vitality += amount;
             maxHealth = 100 + (stats.vitality * 10);
+            if(stats.vitality > 100) stats.vitality = 100;
         }
+        
     }
     
     void exp(int amount){

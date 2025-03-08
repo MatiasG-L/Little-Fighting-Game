@@ -22,4 +22,9 @@ class Enemy{
         this->sprite = sprite;
         this->weakness = weakness;
     }
+    
+    void damage(int amount, char weakness){
+        if(this->weakness == weakness) amount *= 1.5;
+        health -= amount;
+    }
 };
