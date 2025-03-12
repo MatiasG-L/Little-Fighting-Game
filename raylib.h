@@ -201,15 +201,24 @@ Rectangle
     #define RL_BOOL_TYPE
 #endif
 
-
+//linear interpolation given two numbers 
 float lerp(float start, float end, float t){
     return start + (end - start) * t;
 }
+
 // Vector2, 2 components
 typedef struct Vector2 {
     float x;                // Vector x component
     float y;                // Vector y component
 } Vector2;
+
+//linear intorpolation given two points as a Vector2
+Vector2 lerpV(Vector2 start, Vector2 end, float t){ return {lerp(start.x, end.x, t), lerp(start.y, end.y, t)}; }
+
+//return the sum of each axis as a Vector2
+Vector2 vectorAddition(Vector2 *a, Vector2 *b){return{a->x + b->x, a->y + b->y};}
+//return the difference of each axis as a Vector2
+Vector2 vectorSubtraction(Vector2 *a, Vector2 *b){return{a->x - b->x, a->y - b->y};}
 
 // Vector3, 3 components
 typedef struct Vector3 {

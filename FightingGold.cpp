@@ -44,6 +44,9 @@
 #define NORTHEAST(s) CLITERAL(Vector2){ s, -s }
 #define NORTHWEST(s)  CLITERAL(Vector2){ -s, -s } 
 #define SOUTHWEST(s)  CLITERAL(Vector2){ -s, s } 
+
+//macro that defines the players scale for graphical rendering
+#define PLAYER_SCALE 3.5
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
@@ -55,6 +58,9 @@ Vector2 movementRequestS(char axis, int amountY, Vector2 position);
 //function to handle vector addition because ofc you cant just += them
 Vector2 vectorAddition(Vector2 *a, Vector2 *b);
 
+char playerHealth[50];
+char playerMana[50];
+char playerStamina[50];
 
 std::vector<Wall> walls;
 std::vector<projectile> projectiles;
@@ -101,9 +107,28 @@ int main(void)
     Texture2D Clear = LoadTexture("Sprites/Icons/Clear.png");
     //Texture loading
     Texture2D PlayerTexture = LoadTexture("Sprites/Player/Player.png");
+    Texture2D PlayerIdle = LoadTexture("Sprites/Player/Player_idle.png");
+    Texture2D PlayerWalk = LoadTexture("Sprites/Player/Player_walk.png");
+    Texture2D PlayerCast = LoadTexture("Sprites/Player/Player_cast.png");
     Texture2D TreeTexture = LoadTexture("Sprites/Objects/Tree.png");
     Texture2D FireBarPhy = LoadTexture("Sprites/Objects/FireBall.png");
     Texture2D Dummy = LoadTexture("Sprites/Objects/Dummy.png");
+    Texture2D Circle = LoadTexture("Sprites/Icons/Circle.png");
+    
+    PlayerIdle.width *= PLAYER_SCALE;
+    PlayerIdle.height *= PLAYER_SCALE;
+    
+    PlayerWalk.width *= PLAYER_SCALE;
+    PlayerWalk.height *= PLAYER_SCALE;
+    
+    PlayerCast.width *= PLAYER_SCALE;
+    PlayerCast.height *= PLAYER_SCALE;
+    
+    player.walk = {5, 4, PlayerWalk.width, PlayerWalk.height, "walk"};
+    player.idle = {4, 3, PlayerIdle.width, PlayerIdle.height, "idle"};
+    player.cast = {6, 4, PlayerCast.width, PlayerCast.height, "cast"};
+    
+    player.changeAnimation("idle", PlayerIdle);
     
     Wall wall1(200, 200, 195, 300, TreeTexture);
     Wall wall2(700, 200, 195, 300, TreeTexture);
@@ -129,6 +154,7 @@ int main(void)
     Spell lightningSpear('a', 150, 60, 'l', "Lightning Spear", 'b',/*speed*/ 100, 1200, "Sprites/Icons/LightningSpear.png", "Sprites/Objects/LightningSpear.png");// creates a spell
     Spell waterSpear('a', 30, 70, 'w', "Water Spear", 'b',/*speed*/ 50, 900, "Sprites/Icons/WaterSpear.png", "Sprites/Objects/WaterSpear.png");// creates a spell
     Spell rock('a', 20, 30, 's', "Rock", 'b',/*speed*/ 20, 700, "Sprites/Icons/Rock.png", "Sprites/Objects/Rock.png");// creates a spell
+    Spell fireArrow('a', 160, 65, 'f', "Rock", 'b',/*speed*/ 20, 700, "Sprites/Icons/FireArrow.png", "Sprites/Objects/FireArrow.png");// creates a spell
     
     Slot slot1({0, 0}, 100, 100, &fireBall);
     Slot slot2({0, 0}, 100, 100, &waterBall);
@@ -137,6 +163,7 @@ int main(void)
     Slot slot5({250, 250}, 100, 100, &lightningSpear);
     Slot slot6({250, 250}, 100, 100, &rock);
     Slot slot7({250, 250}, 100, 100, &waterSpear);
+    Slot slot8({250, 250}, 100, 100, &fireArrow);
      inventory inventory;// created an instance for the inventory
      struct inventory hotBar;//created an instance for the hotbar
      
@@ -157,6 +184,7 @@ int main(void)
      inventory.spells.push_back(slot5);// adds the created spell to the spells vector in the inventory
      inventory.spells.push_back(slot6);// adds the created spell to the spells vector in the inventory
      inventory.spells.push_back(slot7);// adds the created spell to the spells vector in the inventory
+     inventory.spells.push_back(slot8);// adds the created spell to the spells vector in the inventory
     
      
     
@@ -204,10 +232,12 @@ int main(void)
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         
+        player.animation();
+        
         if(timerRegenMana < 0.01){
             timerRegenMana += GetFrameTime();
         }else if(player.mana < player.maxMana){
-            player.mana += 2;
+            player.mana += 1;
             timerRegenMana = 0;
         }
         
@@ -228,6 +258,14 @@ int main(void)
             }
         }
        
+       if(IsKeyDown(KEY_D) || IsKeyDown(KEY_W) || IsKeyDown(KEY_S) || IsKeyDown(KEY_A)){
+           if(player.currentAnimation != "walk") player.changeAnimation("walk", PlayerWalk);
+       }else if(player.currentAnimation != "idle"){
+           player.changeAnimation("idle", PlayerIdle);
+       }
+       
+       
+       
        //stamina regeneration
         if(timerRegen < 0.1){
             timerRegen += GetFrameTime();
@@ -241,6 +279,7 @@ int main(void)
         }else{
             if(IsKeyDown(KEY_D) && !IsKeyDown(KEY_LEFT_SHIFT)){
                 player.position = movementRequestS('x', player.stats.agility  * 2 + 15, player.position);
+                
                 
             }else if(IsKeyDown(KEY_D) && IsKeyDown(KEY_LEFT_SHIFT) && player.stamina >= 0){
                 player.position = movementRequestS('x', player.stats.agility  * 2 + 30, player.position);
@@ -345,12 +384,16 @@ int main(void)
             inventoryUI = !inventoryUI;
         }
         if(IsKeyPressed(KEY_P)){
-            player.updateStat(10,'m');
-            player.updateStat(10,'e');
-            player.updateStat(10,'a');
-            player.updateStat(10,'s');
-            player.updateStat(10,'p');
-            player.updateStat(10,'v');
+            player.updateStat(1,'m');
+            player.updateStat(1,'e');
+            player.updateStat(1,'a');
+            player.updateStat(1,'s');
+            player.updateStat(1,'p');
+            player.updateStat(1,'v');
+        }
+        
+        if(IsKeyPressed(KEY_K)){
+            player.updateStat(2,'m');
         }
         
         if(IsKeyPressed(KEY_E)){
@@ -390,7 +433,8 @@ int main(void)
                 
                 //draws the player
                 DrawRectangleLines(player.position.x, player.position.y, player.width, player.height, BLACK);
-                DrawTexture(PlayerTexture, player.position.x - 40, player.position.y-45, WHITE);
+               // DrawTexture(PlayerTexture, player.position.x - 40, player.position.y-45, WHITE);
+                DrawTextureRec(player.texture, player.animRec, vectorSubtraction(&player.position, new Vector2{45,45}), WHITE);
                 
                 //draws the walls
                 for(int i = 0; i < walls.size(); i++){
@@ -422,7 +466,11 @@ int main(void)
                 }
             EndMode2D();
            
+           DrawFPS(0,0);
            
+           sprintf(playerHealth, "%d / %d", player.health, player.maxHealth);
+           sprintf(playerMana, "%d / %d", player.mana, player.maxMana);
+           sprintf(playerStamina, "%d / %d", player.stamina, player.maxStamina);
            
            //Draws health bar & text
            std::string text = "";
@@ -438,16 +486,17 @@ int main(void)
            DrawRectangle(50, 50, 500 + player.maxHealth*2, 40, GRAY);
            DrawRectangle(50, 50, (((float)player.health/(float)player.maxHealth) * (500 + player.maxHealth * 2)), 40, MAROON);
            DrawRectangleLinesEx({50, 50, 500 + player.maxHealth*2, 40}, 2,BLACK);
-           DrawText(text.c_str(), 60, 60, 20, BLACK);
+           DrawText(playerHealth, 60, 60, 20, BLACK);
            //draws mana bar
            DrawRectangle(50, 100, player.maxMana*4, 40, GRAY);
            DrawRectangle(50, 100, player.mana * 4, 40, DARKBLUE);
            DrawRectangleLinesEx({50, 100, player.maxMana*4, 40}, 2,BLACK);
+           DrawText(playerMana, 60, 110, 20, BLACK);
            //draws stamina bar
            DrawRectangle(50, 150, player.maxStamina * 5, 40, GRAY);
            DrawRectangle(50, 150, player.stamina * 5, 40, DARKGREEN);
            DrawRectangleLinesEx({50, 150, player.maxStamina*5, 40}, 2,BLACK);
-           
+           DrawText(playerStamina, 60, 160, 20, BLACK);
            
            //inventory drawing and draging  
            if(inventoryUI){
@@ -460,12 +509,13 @@ int main(void)
                 DrawRectangle(435, 170, 200, 50, GRAY);
                 DrawText("stats", 490 ,180, 30, BLACK);
                 
-                if(CheckCollisionPointRec({GetMouseX(), GetMouseY()}, {435, 170, 200, 50}) && IsMouseButtonPressed(0)) stat = !stat;
+                if(CheckCollisionPointRec({GetMouseX(), GetMouseY()}, {435, 170, 200, 50}) && IsMouseButtonPressed(0)) stat = true;
+                if(CheckCollisionPointRec({GetMouseX(), GetMouseY()}, {225, 170, 200, 50}) && IsMouseButtonPressed(0)) stat = false;
                 
                 
                 if(!stat){
                 
-                int posX = 275;
+                int posX = 260;
                 int posY = 275;
                 
                 
@@ -559,9 +609,40 @@ int main(void)
                DrawRectangleLinesEx({400, 525, 200, 30}, 2,BLACK);
                
                
+               DrawTextureEx(Circle, {800, 300}, 0, 0.3, WHITE);
                
-              // DrawText("inventory", 250 ,180, 30, BLACK);
+               DrawText("M", 750 + (Circle.width/2-Circle.width/4)*0.3, 300, 30, BLACK);
+               DrawText("E", 850 + (Circle.width-Circle.width/4)*0.3, 300, 30, BLACK);
+               DrawText("A", 750, 300 + (Circle.height/2)*0.3 , 30, BLACK);
+               DrawText("S", 820 + (Circle.width)*0.3, 300 + (Circle.height/2)*0.3, 30, BLACK);
+               DrawText("P", 750 + (Circle.width/4)*0.3, 300 + (Circle.height)*0.3, 30, BLACK);
+               DrawText("V", 800 + (Circle.width-Circle.width/4)*0.3 , 300 + (Circle.height)*0.3, 30, BLACK);
+               /*
+               DrawCircleV({(sin(34) + (800 + (Circle.width/2)*0.3))*1.2, (cos(34) + (300 + (Circle.height/2)*0.3))*1.2},20, GREEN);
+               DrawCircleV({800 + (Circle.width-Circle.width/4)*0.3 , 300},5,GREEN);
+               DrawCircleV({800, 300 + (Circle.height/2)*0.3 },5,GREEN);
+               DrawCircleV({800 + (Circle.width)*0.3 , 300 + (Circle.height/2)*0.3 },5,GREEN);
+               DrawCircleV({800 + (Circle.width/4)*0.3, 300 + (Circle.height)*0.3 },5,GREEN);
+               DrawCircleV({800 + (Circle.width-Circle.width/4)*0.3 , 300 + (Circle.height)*0.3 },5,GREEN);
                
+               DrawCircleV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, 5, BLACK);
+               
+               DrawCircleV(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width/4)*0.3 ,300}, ((float)player.stats.mana/100)), 5, BLACK);
+               DrawCircleV(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width-Circle.width/4)*0.3 , 300}, ((float)player.stats.endurence/100)), 5, BLACK);
+               DrawCircleV(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800, 300 + (Circle.height/2)*0.3 }, ((float)player.stats.agility/100)), 5, BLACK);
+               DrawCircleV(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width)*0.3 , 300 + (Circle.height/2)*0.3 }, ((float)player.stats.skill/100)), 5, BLACK);
+               DrawCircleV(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width/4)*0.3, 300 + (Circle.height)*0.3 }, ((float)player.stats.power/100)), 5, BLACK);
+               DrawCircleV(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width-Circle.width/4)*0.3 , 300 + (Circle.height)*0.3 }, ((float)player.stats.vitality/100)), 5, BLACK);
+               */
+               DrawLineEx(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width/4)*0.3 ,300}, ((float)player.stats.mana/100)), lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width-Circle.width/4)*0.3 , 300}, ((float)player.stats.endurence/100)), 3, BLACK); 
+               DrawLineEx(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width-Circle.width/4)*0.3 , 300}, ((float)player.stats.endurence/100)), lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width)*0.3 , 300 + (Circle.height/2)*0.3 }, ((float)player.stats.agility/100)), 3, BLACK); 
+               DrawLineEx(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width)*0.3 , 300 + (Circle.height/2)*0.3 }, ((float)player.stats.agility/100)), lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width-Circle.width/4)*0.3 , 300 + (Circle.height)*0.3 }, ((float)player.stats.skill/100)), 3, BLACK); 
+               DrawLineEx(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width-Circle.width/4)*0.3 , 300 + (Circle.height)*0.3 }, ((float)player.stats.skill/100)), lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width/4)*0.3, 300 + (Circle.height)*0.3 }, ((float)player.stats.power/100)), 3, BLACK); 
+               DrawLineEx(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width/4)*0.3, 300 + (Circle.height)*0.3 }, ((float)player.stats.power/100)), lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800, 300 + (Circle.height/2)*0.3 }, ((float)player.stats.vitality/100)), 3, BLACK); 
+               DrawLineEx(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800, 300 + (Circle.height/2)*0.3 }, ((float)player.stats.vitality/100)), lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width/4)*0.3 ,300}, ((float)player.stats.mana/100)), 3, BLACK); 
+               
+              
+                
            }
            
            }
@@ -638,7 +719,7 @@ int main(void)
       UnloadTexture(PlayerTexture);
       UnloadTexture(TreeTexture);
       UnloadTexture(FireBarPhy);
-      
+      UnloadTexture(Circle);      
 
     CloseWindow();                // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
@@ -686,5 +767,4 @@ Vector2 movementRequestS(char axis, int amount, Vector2 position){
        //return statement that does nothing to make the compiler happy
        return {0,0};
 }
-//return the sum of each axis as a Vector2
-Vector2 vectorAddition(Vector2 *a, Vector2 *b){return{a->x + b->x, a->y + b->y};}
+

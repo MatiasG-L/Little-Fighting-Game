@@ -12,10 +12,12 @@
 class Player{
     
     public:
-    // player attributes *scale together to maintan the apperance of the player square*
+    // player attributes
     float width = 80;
     float height = 160;
     Rectangle Rec; //Rectangle struct used for the DrawRectanglePro function
+    
+    std::string state = "idle";
     
     int maxHealth;
     int health;
@@ -29,6 +31,28 @@ class Player{
     int level = 1;
     int EXP = 0;
     int nextLevel = 200; 
+    
+    int frameCounter = 0; 
+    int frameSpeed = 4; //(fps)
+    int frameCount = 3;
+    int currentFrame = 0;
+    float aWidth;
+    Rectangle animRec;
+    std::string currentAnimation = "idle";
+    
+    Texture2D texture;
+    
+    typedef struct Animation{
+        int frameSpeed;
+        int frameCount;
+        float width;
+        float height;
+        std::string name;
+    }Animation;
+    
+    Animation idle;
+    Animation walk;
+    Animation cast;
     
     typedef struct Stats{
         int mana;
@@ -122,5 +146,48 @@ class Player{
             updateStat(1, 'v');
         }else EXP += amount;
         
+    }
+    //function that handles the animation change
+    void changeAnimation(std::string name, Texture2D texture){
+       
+        if(name == "walk"){
+            frameSpeed = walk.frameSpeed;
+            frameCount = walk.frameCount;
+            animRec = {0,0,(float)walk.width/walk.frameCount, (float)walk.height};
+            aWidth = walk.width;
+            currentAnimation = walk.name;
+            this->texture = texture;
+        }
+        if(name == "idle"){
+            frameSpeed = idle.frameSpeed;
+            frameCount = idle.frameCount;
+            animRec = {0,0,(float)idle.width/idle.frameCount, (float)idle.height};
+            aWidth = idle.width;
+            currentAnimation = idle.name;
+            this->texture = texture;
+        }
+        if(name == "cast"){
+            frameSpeed = cast.frameSpeed;
+            frameCount = cast.frameCount;
+            animRec = {0,0,(float)cast.width/cast.frameCount, (float)cast.height};
+            aWidth = cast.width;
+            currentAnimation = cast.name;
+            this->texture = texture;
+        }
+    }
+    //function that handles the animations
+    void animation(){
+        frameCounter++;
+
+        if (frameCounter >= (60/frameSpeed))
+        {
+            frameCounter = 0;
+            currentFrame++;
+
+            if (currentFrame > frameCount-1) currentFrame = 0;
+
+            animRec.x = (float)currentFrame*(float)aWidth/frameCount;
+        }
+
     }
 };
