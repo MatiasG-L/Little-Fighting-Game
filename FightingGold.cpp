@@ -130,12 +130,12 @@ int main(void)
     
     player.changeAnimation("idle", PlayerIdle);
     
-    Wall wall1(200, 200, 195, 300, TreeTexture);
-    Wall wall2(700, 200, 195, 300, TreeTexture);
-    Wall wall3(900, 500, 195, 300, TreeTexture);
-    Wall wall4(-200, -100, 195, 300, TreeTexture);
-    Wall wall5(500, 900, 195, 300, TreeTexture);
-    Wall wall6(200, 1200, 195, 300, TreeTexture);
+    Wall wall1(200, 200, 165, 300, TreeTexture);
+    Wall wall2(700, 200, 165, 300, TreeTexture);
+    Wall wall3(900, 500, 165, 300, TreeTexture);
+    Wall wall4(-200, -100, 165, 300, TreeTexture);
+    Wall wall5(500, 900, 165, 300, TreeTexture);
+    Wall wall6(200, 1200, 165, 300, TreeTexture);
 
     walls.push_back(wall1);
     walls.push_back(wall2);
@@ -392,8 +392,23 @@ int main(void)
             player.updateStat(1,'v');
         }
         
-        if(IsKeyPressed(KEY_K)){
+        if(IsKeyPressed(KEY_ONE)){
             player.updateStat(2,'m');
+        }
+        if(IsKeyPressed(KEY_TWO)){
+            player.updateStat(2,'e');
+        }
+        if(IsKeyPressed(KEY_THREE)){
+            player.updateStat(2,'a');
+        }
+        if(IsKeyPressed(KEY_FOUR)){
+            player.updateStat(2,'s');
+        }
+        if(IsKeyPressed(KEY_FIVE)){
+            player.updateStat(2,'p');
+        }
+        if(IsKeyPressed(KEY_SIX)){
+            player.updateStat(2,'v');
         }
         
         if(IsKeyPressed(KEY_E)){
@@ -422,30 +437,35 @@ int main(void)
       
         BeginDrawing();
             
-             
-           
-            
             //anything drawn inside of the BeginMode2D() and EndMode2D() are going to be drawn onto the world and wont move with the camera but anything drawn after EndMode2D() is drawn onto the screen and moves with the camera useful for UI
             BeginMode2D(camera);
             
                 ClearBackground(DARKGREEN);
                 
-                
                 //draws the player
-                DrawRectangleLines(player.position.x, player.position.y, player.width, player.height, BLACK);
+                
                // DrawTexture(PlayerTexture, player.position.x - 40, player.position.y-45, WHITE);
-                DrawTextureRec(player.texture, player.animRec, vectorSubtraction(&player.position, new Vector2{45,45}), WHITE);
+               // DrawTextureRec(player.texture, player.animRec, vectorSubtraction(&player.position, new Vector2{45,45}), WHITE);
                 
-                //draws the walls
-                for(int i = 0; i < walls.size(); i++){
-                   // DrawRectangleLines(walls[i].position.x, walls[i].position.y, walls[i].width, walls[i].height, WHITE);
-                    DrawTexture(walls[i].texture, walls[i].position.x - 170, walls[i].position.y - 190, WHITE);
+                //draws the walls & enemies
+                bool playerL = false;
+                    for(int i = 0; i < walls.size(); i++){
+
+                        if(player.position.y < walls[i].position.y +120 && !playerL){
+                            DrawTextureRec(player.texture, player.animRec, vectorSubtraction(&player.position, new Vector2{45,120}), WHITE);
+                            playerL = true;
+                        }
+
+                        DrawTexture(walls[i].texture, walls[i].position.x-190, walls[i].position.y - 185, WHITE);
+                        DrawRectangleLines(walls[i].position.x, walls[i].position.y, walls[i].width, walls[i].height, WHITE);
+                    }
+                if(!playerL){
+                    DrawTextureRec(player.texture, player.animRec, vectorSubtraction(&player.position, new Vector2{45,120}), WHITE);
                 }
-                
+                DrawRectangleLines(player.position.x, player.position.y, player.width, player.height, BLACK);
                 //draws the enemies
                 for(int i = 0; i < enemies.size(); i++){
-                    DrawRectangle(enemies[i].position.x , enemies[i].position.y - 30, ((
-                    (float)enemies[i].health/(float)enemies[i].maxHealth)*enemies[i].width), 20, MAROON);
+                    DrawRectangle(enemies[i].position.x, enemies[i].position.y - 30, (((float)enemies[i].health/(float)enemies[i].maxHealth)*enemies[i].width), 20, MAROON);
                     DrawTextureEx(enemies[i].sprite, {enemies[i].position.x, enemies[i].position.y}, 0, 9.5, WHITE);
                     DrawRectangleLines(enemies[i].position.x, enemies[i].position.y, enemies[i].width, enemies[i].height, BLACK);
                 }
@@ -464,7 +484,7 @@ int main(void)
                    
                     DrawRectangleLines(projectiles[i].position.x, projectiles[i].position.y, projectiles[i].width, projectiles[i].height, BLACK);
                 }
-            EndMode2D();
+           EndMode2D();
            
            DrawFPS(0,0);
            
@@ -472,25 +492,14 @@ int main(void)
            sprintf(playerMana, "%d / %d", player.mana, player.maxMana);
            sprintf(playerStamina, "%d / %d", player.stamina, player.maxStamina);
            
-           //Draws health bar & text
-           std::string text = "";
-           text += player.health;
-           text += " \\ ";
-           text += player.maxHealth;
-           text += "\0";
-           
-           
-           
-          // std::cout << "Health: " << player.health << " \\ " << player.maxHealth;
-           
            DrawRectangle(50, 50, 500 + player.maxHealth*2, 40, GRAY);
            DrawRectangle(50, 50, (((float)player.health/(float)player.maxHealth) * (500 + player.maxHealth * 2)), 40, MAROON);
            DrawRectangleLinesEx({50, 50, 500 + player.maxHealth*2, 40}, 2,BLACK);
            DrawText(playerHealth, 60, 60, 20, BLACK);
            //draws mana bar
-           DrawRectangle(50, 100, player.maxMana*4, 40, GRAY);
-           DrawRectangle(50, 100, player.mana * 4, 40, DARKBLUE);
-           DrawRectangleLinesEx({50, 100, player.maxMana*4, 40}, 2,BLACK);
+           DrawRectangle(50, 100, player.maxMana*3, 40, GRAY);
+           DrawRectangle(50, 100, player.mana * 3, 40, DARKBLUE);
+           DrawRectangleLinesEx({50, 100, player.maxMana*3, 40}, 2,BLACK);
            DrawText(playerMana, 60, 110, 20, BLACK);
            //draws stamina bar
            DrawRectangle(50, 150, player.maxStamina * 5, 40, GRAY);
@@ -613,10 +622,10 @@ int main(void)
                
                DrawText("M", 750 + (Circle.width/2-Circle.width/4)*0.3, 300, 30, BLACK);
                DrawText("E", 850 + (Circle.width-Circle.width/4)*0.3, 300, 30, BLACK);
-               DrawText("A", 750, 300 + (Circle.height/2)*0.3 , 30, BLACK);
-               DrawText("S", 820 + (Circle.width)*0.3, 300 + (Circle.height/2)*0.3, 30, BLACK);
+               DrawText("V", 750, 300 + (Circle.height/2)*0.3 , 30, BLACK);
+               DrawText("A", 820 + (Circle.width)*0.3, 300 + (Circle.height/2)*0.3, 30, BLACK);
                DrawText("P", 750 + (Circle.width/4)*0.3, 300 + (Circle.height)*0.3, 30, BLACK);
-               DrawText("V", 800 + (Circle.width-Circle.width/4)*0.3 , 300 + (Circle.height)*0.3, 30, BLACK);
+               DrawText("S", 800 + (Circle.width-Circle.width/4)*0.3 , 300 + (Circle.height)*0.3, 30, BLACK);
                /*
                DrawCircleV({(sin(34) + (800 + (Circle.width/2)*0.3))*1.2, (cos(34) + (300 + (Circle.height/2)*0.3))*1.2},20, GREEN);
                DrawCircleV({800 + (Circle.width-Circle.width/4)*0.3 , 300},5,GREEN);

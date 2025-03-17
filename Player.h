@@ -14,8 +14,8 @@ class Player{
     public:
     // player attributes
     float width = 80;
-    float height = 160;
-    Rectangle Rec; //Rectangle struct used for the DrawRectanglePro function
+    float height = 90;
+    Rectangle Rec; //Rectangle struct used for the DrawRectanglePro function (currently useless i suppose)
     
     std::string state = "idle";
     
