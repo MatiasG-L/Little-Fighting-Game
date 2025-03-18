@@ -31,6 +31,7 @@ class Player{
     int level = 1;
     int EXP = 0;
     int nextLevel = 200; 
+    int statPoint = 0;
     
     int frameCounter = 0; 
     int frameSpeed = 4; //(fps)

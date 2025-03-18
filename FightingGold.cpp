@@ -156,6 +156,13 @@ int main(void)
     Spell rock('a', 20, 30, 's', "Rock", 'b',/*speed*/ 20, 700, "Sprites/Icons/Rock.png", "Sprites/Objects/Rock.png");// creates a spell
     Spell fireArrow('a', 160, 65, 'f', "Rock", 'b',/*speed*/ 20, 700, "Sprites/Icons/FireArrow.png", "Sprites/Objects/FireArrow.png");// creates a spell
     
+    Spell weakHeal('h', 10, 10, 'h', "Weak Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/WeakHeal.png", "Sprites/Icons/Clear.png");// creates a healing spell
+    Spell lightHeal('h', 20, 8, 'h', "Light Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/LightHeal.png", "Sprites/Icons/Clear.png");// creates a healing spell
+    Spell midHeal('h', 40, 6, 'h', "Mid Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/MidHeal.png", "Sprites/Icons/Clear.png");// creates a healing spell
+    Spell strongHeal('h', 60, 4, 'h', "Strong Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/StrongHeal.png", "Sprites/Icons/Clear.png");// creates a healing spell
+    Spell superHeal('h', 100, 2, 'h', "Super Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/SuperHeal.png", "Sprites/Icons/Clear.png");// creates a healing spell
+    Spell fullHeal('h', 10000, 1, 'h', "Full Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/FullHeal.png", "Sprites/Icons/Clear.png");// creates a healing spell
+    
     Slot slot1({0, 0}, 100, 100, &fireBall);
     Slot slot2({0, 0}, 100, 100, &waterBall);
     Slot slot3({250, 250}, 100, 100, &lightningBolt);
@@ -164,6 +171,13 @@ int main(void)
     Slot slot6({250, 250}, 100, 100, &rock);
     Slot slot7({250, 250}, 100, 100, &waterSpear);
     Slot slot8({250, 250}, 100, 100, &fireArrow);
+    
+    Slot slot9({250, 250}, 100, 100, &weakHeal);
+    Slot slot10({250, 250}, 100, 100, &lightHeal);
+    Slot slot11({250, 250}, 100, 100, &midHeal);
+    Slot slot12({250, 250}, 100, 100, &strongHeal);
+    Slot slot13({250, 250}, 100, 100, &superHeal);
+    Slot slot14({250, 250}, 100, 100, & fullHeal);
      inventory inventory;// created an instance for the inventory
      struct inventory hotBar;//created an instance for the hotbar
      
@@ -185,6 +199,12 @@ int main(void)
      inventory.spells.push_back(slot6);// adds the created spell to the spells vector in the inventory
      inventory.spells.push_back(slot7);// adds the created spell to the spells vector in the inventory
      inventory.spells.push_back(slot8);// adds the created spell to the spells vector in the inventory
+     inventory.spells.push_back(slot9);// adds the created spell to the spells vector in the inventory
+     inventory.spells.push_back(slot10);// adds the created spell to the spells vector in the inventory
+     inventory.spells.push_back(slot11);// adds the created spell to the spells vector in the inventory
+     inventory.spells.push_back(slot12);// adds the created spell to the spells vector in the inventory
+     inventory.spells.push_back(slot13);// adds the created spell to the spells vector in the inventory
+     inventory.spells.push_back(slot14);// adds the created spell to the spells vector in the inventory
     
      
     
@@ -328,7 +348,7 @@ int main(void)
        }
        
        
-       if(currentSpell != NULL && currentSpell->manaConsumption <= player.mana){
+       if(currentSpell != NULL && currentSpell->manaConsumption <= player.mana && currentSpell->spellType == 'a'){
        if((IsKeyPressed(KEY_RIGHT) && IsKeyPressed(KEY_UP))){
            projectile ball({player.position.x + player.width, player.position.y + player.height/2 -50}, currentSpell->range, NORTHEAST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 315);
            player.updateMana(-currentSpell->manaConsumption);
@@ -371,7 +391,13 @@ int main(void)
            projectiles.push_back(ball);
            player.updateMana(-currentSpell->manaConsumption);
        }
+       }else if(currentSpell != NULL && (float)player.maxMana/currentSpell->manaConsumption <= player.mana){
+           if(IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_RIGHT)){
+               player.updateMana(-(float)player.maxMana/currentSpell->manaConsumption);
+               player.updateHealth(currentSpell->potency);
+           }
        }
+       
        camera.target = {lerp(camera.target.x, player.position.x, 1.5 * GetFrameTime()), lerp(camera.target.y, player.position.y, 1.7 * GetFrameTime())};
             
         if(IsKeyPressed(KEY_R)){
@@ -384,12 +410,12 @@ int main(void)
             inventoryUI = !inventoryUI;
         }
         if(IsKeyPressed(KEY_P)){
-            player.updateStat(1,'m');
-            player.updateStat(1,'e');
-            player.updateStat(1,'a');
-            player.updateStat(1,'s');
-            player.updateStat(1,'p');
-            player.updateStat(1,'v');
+            player.updateStat(2,'m');
+            player.updateStat(2,'e');
+            player.updateStat(2,'a');
+            player.updateStat(2,'s');
+            player.updateStat(2,'p');
+            player.updateStat(2,'v');
         }
         
         if(IsKeyPressed(KEY_ONE)){
@@ -491,20 +517,20 @@ int main(void)
            sprintf(playerHealth, "%d / %d", player.health, player.maxHealth);
            sprintf(playerMana, "%d / %d", player.mana, player.maxMana);
            sprintf(playerStamina, "%d / %d", player.stamina, player.maxStamina);
-           
-           DrawRectangle(50, 50, 500 + player.maxHealth*2, 40, GRAY);
-           DrawRectangle(50, 50, (((float)player.health/(float)player.maxHealth) * (500 + player.maxHealth * 2)), 40, MAROON);
-           DrawRectangleLinesEx({50, 50, 500 + player.maxHealth*2, 40}, 2,BLACK);
+           //draws health bar
+           DrawRectangle(50, 50, lerp(500, 1500, (float)player.stats.vitality/100), 40, GRAY);
+           DrawRectangle(50, 50, (((float)player.health/(float)player.maxHealth) * lerp(500, 1500, (float)player.stats.vitality/100)), 40, MAROON);
+           DrawRectangleLinesEx({50, 50, lerp(500, 1500, (float)player.stats.vitality/100), 40}, 2,BLACK);
            DrawText(playerHealth, 60, 60, 20, BLACK);
            //draws mana bar
-           DrawRectangle(50, 100, player.maxMana*3, 40, GRAY);
-           DrawRectangle(50, 100, player.mana * 3, 40, DARKBLUE);
-           DrawRectangleLinesEx({50, 100, player.maxMana*3, 40}, 2,BLACK);
+           DrawRectangle(50, 100, lerp(500, 1500, (float)player.stats.mana/100), 40, GRAY);
+           DrawRectangle(50, 100, (((float)player.mana/(float)player.maxMana) * lerp(500, 1500, (float)player.stats.mana/100)), 40, DARKBLUE);
+           DrawRectangleLinesEx({50, 100, lerp(500, 1500, (float)player.stats.mana/100), 40}, 2,BLACK);
            DrawText(playerMana, 60, 110, 20, BLACK);
            //draws stamina bar
-           DrawRectangle(50, 150, player.maxStamina * 5, 40, GRAY);
-           DrawRectangle(50, 150, player.stamina * 5, 40, DARKGREEN);
-           DrawRectangleLinesEx({50, 150, player.maxStamina*5, 40}, 2,BLACK);
+           DrawRectangle(50, 150, lerp(500, 1500, (float)player.stats.endurence/100), 40, GRAY);
+           DrawRectangle(50, 150, (((float)player.stamina/(float)player.maxStamina) * lerp(500, 1500, (float)player.stats.endurence/100)), 40, DARKGREEN);
+           DrawRectangleLinesEx({50, 150, lerp(500, 1500, (float)player.stats.endurence/100), 40}, 2,BLACK);
            DrawText(playerStamina, 60, 160, 20, BLACK);
            
            //inventory drawing and draging  
