@@ -61,6 +61,9 @@ Vector2 vectorAddition(Vector2 *a, Vector2 *b);
 char playerHealth[50];
 char playerMana[50];
 char playerStamina[50];
+char playerLevel[50];
+char playerEXP[50];
+char playerStat[50];
 
 std::vector<Wall> walls;
 std::vector<projectile> projectiles;
@@ -114,6 +117,7 @@ int main(void)
     Texture2D FireBarPhy = LoadTexture("Sprites/Objects/FireBall.png");
     Texture2D Dummy = LoadTexture("Sprites/Objects/Dummy.png");
     Texture2D Circle = LoadTexture("Sprites/Icons/Circle.png");
+    Texture2D PlusButton = LoadTexture("Sprites/Icons/PlusButton.png");
     
     PlayerIdle.width *= PLAYER_SCALE;
     PlayerIdle.height *= PLAYER_SCALE;
@@ -208,13 +212,24 @@ int main(void)
     
      
     
-     Enemy dum({300, 700}, 150, 150, 300, 300, 0, 50, Dummy, 'f');
-     Enemy dum1({500, 900}, 150, 150, 300, 300, 0, 50, Dummy, 'f');
-     Enemy dum2({0, 100}, 150, 150, 300, 300, 0, 50, Dummy, 'w');
-     
+     Enemy dum({300, 700}, 150, 150, 300, 300, 50, 50, Dummy, 'f');
+     Enemy dum1({500, 900}, 150, 150, 300, 300, 50, 50, Dummy, 'f');
+     Enemy dum2({0, 100}, 150, 150, 300, 300, 50, 50, Dummy, 'w');
+     Enemy dum3({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w');
+     Enemy dum4({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w');
+     Enemy dum5({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w');
+     Enemy dum6({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w');
+     Enemy dum7({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w');
+     Enemy dum8({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w');
      enemies.push_back(dum);
      enemies.push_back(dum1);
      enemies.push_back(dum2);
+     enemies.push_back(dum3);
+     enemies.push_back(dum4);
+     enemies.push_back(dum5);
+     enemies.push_back(dum6);
+     enemies.push_back(dum7);
+     enemies.push_back(dum8);
 
     for(int i = 0; i<inventory.spells.size(); i++){
         inventory.spells[i].spell->texture.width = 100;
@@ -223,6 +238,9 @@ int main(void)
     
     PlayerTexture.width = 160;
     PlayerTexture.height = 210;
+    
+    PlusButton.width = 30;
+    PlusButton.height = 30;
     
     
     for(int i = 0; i < walls.size(); i++){
@@ -272,8 +290,10 @@ int main(void)
                     i--;
                 }
                 if(enemies[j].health <= 0){
+                    player.exp(enemies[j].value);
+                    std::cout << "\n" << enemies[j].value << "\n";
                     enemies.erase(enemies.begin() + j);
-                    j--;
+                   // j--;
                 }
             }
         }
@@ -289,8 +309,8 @@ int main(void)
        //stamina regeneration
         if(timerRegen < 0.1){
             timerRegen += GetFrameTime();
-        }else if(player.stamina < player.maxStamina){
-            player.stamina += 1;
+        }else if(player.stamina < player.maxStamina && !IsKeyDown(KEY_LEFT_SHIFT)){
+            player.stamina += 2;
             timerRegen = 0;
         }
          //player movement when holding down the keys
@@ -450,6 +470,12 @@ int main(void)
             currentSpell = hotBar.spells[3].spell;
         }
         
+        if(IsKeyPressed(KEY_V)){
+            player.exp(70);
+        }
+        if(IsKeyPressed(KEY_N)){
+            player.exp(10000);
+        }
         
         for(int i = 0; i<projectiles.size(); i++){
             if(CheckCollisionPointCircle({projectiles[i].position.x, projectiles[i].position.y}, projectiles[i].start, projectiles[i].range)){
@@ -617,31 +643,105 @@ int main(void)
                DrawRectangle(380, 275, 200, 30, DARKGRAY);
                DrawRectangle(380, 275, (((float)player.stats.mana)/100) * 200, 30, DARKGREEN);
                DrawRectangleLinesEx({380, 275, 200, 30}, 2,BLACK);
+               if(player.statPoint >= 1 && player.stats.mana<100){
+                   DrawTexture(PlusButton, 600, 275, WHITE);
+                   if(CheckCollisionPointRec({GetMouseX(), GetMouseY()}, {600, 275, 30, 30}) && IsMouseButtonPressed(0)){
+                        player.updateStat(1, 'm');
+                        player.statPoint -= 1; 
+                   }
+               }else{
+                   DrawTexture(PlusButton, 600, 275, SEMICLEAR);
+               }
+               
+               
                
                DrawText("Endurance: ", 275, 325, 30, BLACK);
                DrawRectangle(470, 325, 200, 30, DARKGRAY);
                DrawRectangle(470, 325, (((float)player.stats.endurence)/100) * 200, 30, DARKGREEN);
                DrawRectangleLinesEx({470, 325, 200, 30}, 2,BLACK);
+               if(player.statPoint >= 1 && player.stats.endurence<100){
+                   DrawTexture(PlusButton, 690, 325, WHITE);
+                   if(CheckCollisionPointRec({GetMouseX(), GetMouseY()}, {690, 325, 30, 30}) && IsMouseButtonPressed(0)){
+                        player.updateStat(1, 'e');
+                        player.statPoint -= 1; 
+                   }
+               }else{
+                   DrawTexture(PlusButton, 690, 325, SEMICLEAR);
+               }
+               
                
                DrawText("Agility: ", 275, 375, 30, BLACK);
                DrawRectangle(400, 375, 200, 30, DARKGRAY);
                DrawRectangle(400, 375, (((float)player.stats.agility)/100) * 200, 30, DARKGREEN);
                DrawRectangleLinesEx({400, 375, 200, 30}, 2,BLACK);
+                if(player.statPoint >= 1&& player.stats.agility<100){
+                   DrawTexture(PlusButton, 610, 375, WHITE);
+                   if(CheckCollisionPointRec({GetMouseX(), GetMouseY()}, {610, 375, 30, 30}) && IsMouseButtonPressed(0) ){
+                        player.updateStat(1, 'a');
+                        player.statPoint -= 1; 
+                   }
+               }else{
+                   DrawTexture(PlusButton, 610, 375, SEMICLEAR);
+               }
+               
                
                DrawText("Skill: ", 275, 425, 30, BLACK);
                DrawRectangle(350, 425, 200, 30, DARKGRAY);
                DrawRectangle(350, 425, (((float)player.stats.skill)/100) * 200, 30, DARKGREEN);
                DrawRectangleLinesEx({350, 425, 200, 30}, 2,BLACK);
+               if(player.statPoint >= 1&& player.stats.skill<100){
+                   DrawTexture(PlusButton, 570, 425, WHITE);
+                   if(CheckCollisionPointRec({GetMouseX(), GetMouseY()}, {570, 425, 30, 30}) && IsMouseButtonPressed(0) ){
+                        player.updateStat(1, 's');
+                        player.statPoint -= 1; 
+                   }
+               }else{
+                   DrawTexture(PlusButton, 570, 425, SEMICLEAR);
+               }
+               
                
                DrawText("Power: ", 275, 475, 30, BLACK);
                DrawRectangle(390, 475, 200, 30, DARKGRAY);
                DrawRectangle(390, 475, (((float)player.stats.power)/100) * 200, 30, DARKGREEN);
                DrawRectangleLinesEx({390, 475, 200, 30}, 2,BLACK);
+               if(player.statPoint >= 1&& player.stats.power<100){
+                   DrawTexture(PlusButton, 600, 475, WHITE);
+                   if(CheckCollisionPointRec({GetMouseX(), GetMouseY()}, {600, 475, 30, 30}) && IsMouseButtonPressed(0) ){
+                        player.updateStat(1, 'p');
+                        player.statPoint -= 1; 
+                    }
+               }else{
+                   DrawTexture(PlusButton, 600, 475, SEMICLEAR);
+               }
+               
                
                DrawText("Vitality: ", 275, 525, 30, BLACK);
                DrawRectangle(400, 525, 200, 30, DARKGRAY);
                DrawRectangle(400, 525, (((float)player.stats.vitality)/100) * 200, 30, DARKGREEN);
                DrawRectangleLinesEx({400, 525, 200, 30}, 2,BLACK);
+               if(player.statPoint >= 1 && player.stats.vitality<100){
+                   DrawTexture(PlusButton, 630, 525, WHITE);
+                   if(CheckCollisionPointRec({GetMouseX(), GetMouseY()}, {630, 525, 30, 30}) && IsMouseButtonPressed(0) ){
+                        player.updateStat(1, 'v');
+                        player.statPoint -= 1; 
+                    }
+               }else{
+                   DrawTexture(PlusButton, 630, 525, SEMICLEAR);
+               }
+               
+               sprintf(playerLevel, "Player Level: %d / %d", player.level, 100);
+               sprintf(playerEXP, "Next level at: %d / %d", player.EXP, player.nextLevel);
+               sprintf(playerStat, "Stat points availible: %d", player.statPoint);
+               
+               DrawText(playerLevel , 275, 600, 30, BLACK);
+               
+               DrawText(playerStat , 245, 235, 30, BLACK);
+               
+               DrawText(playerEXP , 275, 650, 30, BLACK);
+               
+               DrawRectangle(275, 680, 200, 30, DARKGRAY);
+               DrawRectangle(275, 680, lerp(0, 200, (float)player.EXP/(float)player.nextLevel), 30, DARKGREEN);
+               DrawRectangleLinesEx({275, 680, 200, 30}, 2,BLACK);
                
                
                DrawTextureEx(Circle, {800, 300}, 0, 0.3, WHITE);

@@ -30,7 +30,7 @@ class Player{
     
     int level = 1;
     int EXP = 0;
-    int nextLevel = 200; 
+    int nextLevel = 100; 
     int statPoint = 0;
     
     int frameCounter = 0; 
@@ -135,16 +135,19 @@ class Player{
     }
     
     void exp(int amount){
-        if(EXP > nextLevel){
+        if(EXP + amount >= nextLevel){
+            EXP += amount;
             EXP -= nextLevel;
             level += 1;
-            nextLevel *= 1.5;
+            nextLevel *= 1.01;
+            statPoint += 1;
             updateStat(1, 'm');
             updateStat(1, 'e');
             updateStat(1, 'a');
             updateStat(1, 's');
             updateStat(1, 'p');
             updateStat(1, 'v');
+            exp(0);
         }else EXP += amount;
         
     }

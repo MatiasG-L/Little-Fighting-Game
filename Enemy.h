@@ -24,7 +24,7 @@ class Enemy{
     }
     
     void damage(int amount, char weakness){
-        if(this->weakness == weakness) amount *= 1.5;
+    if(this->weakness == weakness) {amount *= 2; std::cout << "\nWEAKNESS\n";}
         health -= amount;
     }
 };

@@ -81,6 +81,7 @@ Rectangle
 #define RAYLIB_H
 
 #include <stdarg.h>     // Required for: va_list - Only used by TraceLogCallback
+#include <ctime> //time
 
 #define RAYLIB_VERSION_MAJOR 5
 #define RAYLIB_VERSION_MINOR 0
@@ -162,6 +163,7 @@ Rectangle
 
 // Some Basic Colors
 // NOTE: Custom raylib color palette for amazing visuals on WHITE background
+#define DEFCOLOR(r,g,b,a)  CLITERAL(Color){ r, b, g, a }  
 #define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }   // Light Gray
 #define GRAY       CLITERAL(Color){ 130, 130, 130, 255 }   // Gray
 #define DARKGRAY   CLITERAL(Color){ 80, 80, 80, 255 }      // Dark Gray
@@ -184,7 +186,8 @@ Rectangle
 #define BROWN      CLITERAL(Color){ 127, 106, 79, 255 }    // Brown
 #define DARKBROWN  CLITERAL(Color){ 76, 63, 47, 255 }      // Dark Brown
 
-#define WHITE      CLITERAL(Color){ 255, 255, 255, 255 }   // White
+#define WHITE      CLITERAL(Color){ 255, 255, 255, 255 }    // White
+#define SEMICLEAR      CLITERAL(Color){ 255, 255, 255, 40 }   //Semi-trasperant color 
 #define BLACK      CLITERAL(Color){ 0, 0, 0, 255 }         // Black
 #define BLANK      CLITERAL(Color){ 0, 0, 0, 0 }           // Blank (Transparent)
 #define MAGENTA    CLITERAL(Color){ 255, 0, 255, 255 }     // Magenta
@@ -204,6 +207,12 @@ Rectangle
 //linear interpolation given two numbers 
 float lerp(float start, float end, float t){
     return start + (end - start) * t;
+}
+
+template<typename T> T random(T min, T max, float time){
+    srand(time + min * max);
+    return (rand() % (max+1 - min)) + min;
+    
 }
 
 // Vector2, 2 components
