@@ -81,7 +81,8 @@ typedef struct inventory{
 
  Spell *currentSpell;
  
-
+ bool healEffect = false;
+ float healWidth = 200;
 
  int indexI = 0;
  int indexH = 0;
@@ -248,9 +249,6 @@ int main(void)
         walls[i].texture.height = 500;
     }
     
-     
-    
-
     //initializes camera values
     Camera2D camera = { 0 };
     camera.offset = {screenWidth/2.0f, screenHeight/2.0f };
@@ -415,6 +413,7 @@ int main(void)
            if(IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_RIGHT)){
                player.updateMana(-(float)player.maxMana/currentSpell->manaConsumption);
                player.updateHealth(currentSpell->potency);
+               healEffect = true;
            }
        }
        
@@ -495,6 +494,17 @@ int main(void)
                 ClearBackground(DARKGREEN);
                 
                 //draws the player
+                
+                if(healEffect){
+                    healWidth = lerp(healWidth, 0, 15 * GetFrameTime());
+                    DrawRectangle(player.position.x + player.width/2 + healWidth, player.position.y - 1000, healWidth, 2000 ,GREEN);
+                    DrawRectangle(player.position.x + player.width/2 - healWidth, player.position.y - 1000, healWidth, 2000 ,GREEN);
+                    DrawCircle(player.position.x + player.width/2, player.position.y, healWidth, GREEN);
+                }
+                if(healWidth < 1){
+                    healWidth = 200;
+                    healEffect = false;
+                }
                 
                // DrawTexture(PlayerTexture, player.position.x - 40, player.position.y-45, WHITE);
                // DrawTextureRec(player.texture, player.animRec, vectorSubtraction(&player.position, new Vector2{45,45}), WHITE);
@@ -901,5 +911,9 @@ Vector2 movementRequestS(char axis, int amount, Vector2 position){
        }
        //return statement that does nothing to make the compiler happy
        return {0,0};
+}
+
+void DrawParticle(){
+    
 }
 

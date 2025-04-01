@@ -204,6 +204,8 @@ Rectangle
     #define RL_BOOL_TYPE
 #endif
 
+
+
 //linear interpolation given two numbers 
 float lerp(float start, float end, float t){
     return start + (end - start) * t;
@@ -262,6 +264,7 @@ typedef struct Color {
     unsigned char b;        // Color blue value
     unsigned char a;        // Color alpha value
 } Color;
+
 
 // Rectangle, 4 components
 typedef struct Rectangle {

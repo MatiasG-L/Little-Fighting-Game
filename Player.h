@@ -101,7 +101,7 @@ class Player{
     }
     void updateMana(int amount){
         float update;
-        if(amount < 0) update = (amount*-1) - (((float)stats.mana/105)*(amount*-1));
+        if(amount < 0) update = ((float)amount*-1) - (((float)stats.skill/105)*((float)amount*-1));
         else update = -amount;
         mana -= update;
         if(mana > maxMana) mana = maxMana;
