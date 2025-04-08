@@ -211,6 +211,8 @@ float lerp(float start, float end, float t){
     return start + (end - start) * t;
 }
 
+
+
 template<typename T> T random(T min, T max, float time){
     srand(time + min * max);
     return (rand() % (max+1 - min)) + min;
@@ -230,6 +232,10 @@ Vector2 lerpV(Vector2 start, Vector2 end, float t){ return {lerp(start.x, end.x,
 Vector2 vectorAddition(Vector2 *a, Vector2 *b){return{a->x + b->x, a->y + b->y};}
 //return the difference of each axis as a Vector2
 Vector2 vectorSubtraction(Vector2 *a, Vector2 *b){return{a->x - b->x, a->y - b->y};}
+//returns the distance between two points(vector2) as a float
+float distance(Vector2 start, Vector2 end){
+    return sqrt(pow(end.x-start.x,2)+pow(end.y-start.y,2));
+}
 
 // Vector3, 3 components
 typedef struct Vector3 {

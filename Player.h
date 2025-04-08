@@ -194,4 +194,6 @@ class Player{
         }
 
     }
+    
+    Vector2 center(){return {position.x + width/2, position.y + height/2};}
 };

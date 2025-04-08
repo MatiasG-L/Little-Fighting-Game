@@ -67,6 +67,7 @@ char playerStat[50];
 
 std::vector<Wall> walls;
 std::vector<projectile> projectiles;
+std::vector<Spell> spellList;
 std::vector<Enemy> enemies;
 
 // used to render the level or main menu
@@ -86,6 +87,10 @@ typedef struct inventory{
 
  int indexI = 0;
  int indexH = 0;
+ 
+ bool combat = false; 
+ bool turn = true;
+ Enemy *target;
 
 Vector2 dragPos;
 
@@ -186,15 +191,19 @@ int main(void)
      inventory inventory;// created an instance for the inventory
      struct inventory hotBar;//created an instance for the hotbar
      
-     Slot slotH1({450, 750}, 100, 100, "Sprites/Icons/Clear.png");
-     Slot slotH2({650, 750}, 100, 100, "Sprites/Icons/Clear.png");
-     Slot slotH3({850, 750}, 100, 100, "Sprites/Icons/Clear.png");
-     Slot slotH4({1050, 750}, 100, 100, "Sprites/Icons/Clear.png");
+     Slot slotH1({250, 750}, 100, 100, "Sprites/Icons/Clear.png");
+     Slot slotH2({450, 750}, 100, 100, "Sprites/Icons/Clear.png");
+     Slot slotH3({650, 750}, 100, 100, "Sprites/Icons/Clear.png");
+     Slot slotH4({850, 750}, 100, 100, "Sprites/Icons/Clear.png");
+     Slot slotH5({1050, 750}, 100, 100, "Sprites/Icons/Clear.png");
+     Slot slotH6({1250, 750}, 100, 100, "Sprites/Icons/Clear.png");
      
      hotBar.spells.push_back(slotH1);
      hotBar.spells.push_back(slotH2);
      hotBar.spells.push_back(slotH3);
      hotBar.spells.push_back(slotH4);
+     hotBar.spells.push_back(slotH5);
+     hotBar.spells.push_back(slotH6);
      
      inventory.spells.push_back(slot1);// adds the created spell to the spells vector in the inventory
      inventory.spells.push_back(slot2);// adds the created spell to the spells vector in the inventory
@@ -213,15 +222,15 @@ int main(void)
     
      
     
-     Enemy dum({300, 700}, 150, 150, 300, 300, 50, 50, Dummy, 'f');
-     Enemy dum1({500, 900}, 150, 150, 300, 300, 50, 50, Dummy, 'f');
-     Enemy dum2({0, 100}, 150, 150, 300, 300, 50, 50, Dummy, 'w');
-     Enemy dum3({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w');
-     Enemy dum4({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w');
-     Enemy dum5({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w');
-     Enemy dum6({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w');
-     Enemy dum7({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w');
-     Enemy dum8({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w');
+     Enemy dum({300, 700}, 150, 150, 300, 300, 50, 50, Dummy, 'f',250);
+     Enemy dum1({500, 900}, 150, 150, 300, 300, 50, 50, Dummy, 'f',250);
+     Enemy dum2({0, 100}, 150, 150, 300, 300, 50, 50, Dummy, 'w',250);
+     Enemy dum3({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w', 250);
+     Enemy dum4({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w', 250);
+     Enemy dum5({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w', 250);
+     Enemy dum6({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w', 250);
+     Enemy dum7({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w', 250);
+     Enemy dum8({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w', 250);
      enemies.push_back(dum);
      enemies.push_back(dum1);
      enemies.push_back(dum2);
@@ -231,6 +240,8 @@ int main(void)
      enemies.push_back(dum6);
      enemies.push_back(dum7);
      enemies.push_back(dum8);
+     
+     
 
     for(int i = 0; i<inventory.spells.size(); i++){
         inventory.spells[i].spell->texture.width = 100;
@@ -272,9 +283,16 @@ int main(void)
         
         if(timerRegenMana < 0.01){
             timerRegenMana += GetFrameTime();
-        }else if(player.mana < player.maxMana){
+        }else if(player.mana < player.maxMana && !combat){
             player.mana += 1;
             timerRegenMana = 0;
+        }
+        
+        for(int i = 0; i < enemies.size(); i++){
+            if(distance(enemies[i].center(), player.center()) <= enemies[i].range && target == NULL){
+                target = &enemies[i];
+                combat = true;
+            }
         }
         
         //projectile collision
@@ -291,7 +309,7 @@ int main(void)
                     player.exp(enemies[j].value);
                     std::cout << "\n" << enemies[j].value << "\n";
                     enemies.erase(enemies.begin() + j);
-                   // j--;
+                    j--;
                 }
             }
         }
@@ -307,15 +325,15 @@ int main(void)
        //stamina regeneration
         if(timerRegen < 0.1){
             timerRegen += GetFrameTime();
-        }else if(player.stamina < player.maxStamina && !IsKeyDown(KEY_LEFT_SHIFT)){
+        }else if(player.stamina < player.maxStamina && !IsKeyDown(KEY_LEFT_SHIFT) && !combat){
             player.stamina += 2;
             timerRegen = 0;
         }
          //player movement when holding down the keys
         if(timerWalk < 0.1){
            timerWalk += GetFrameTime();
-        }else{
-            if(IsKeyDown(KEY_D) && !IsKeyDown(KEY_LEFT_SHIFT)){
+        }else if(!combat){
+            if(IsKeyDown(KEY_D) && (!IsKeyDown(KEY_LEFT_SHIFT) || player.stamina <= 0)){
                 player.position = movementRequestS('x', player.stats.agility  * 2 + 15, player.position);
                 
                 
@@ -324,7 +342,7 @@ int main(void)
                 player.stamina -= 2;
                 timerRegen = 0;
             }
-            if(IsKeyDown(KEY_A) && !IsKeyDown(KEY_LEFT_SHIFT)){
+            if(IsKeyDown(KEY_A) && (!IsKeyDown(KEY_LEFT_SHIFT) || player.stamina <= 0)){
                 player.position = movementRequestS('x', -player.stats.agility  * 2 - 15, player.position);
                 
             }else if(IsKeyDown(KEY_A) && IsKeyDown(KEY_LEFT_SHIFT) && player.stamina >= 0){
@@ -332,7 +350,7 @@ int main(void)
                 player.stamina -= 2;
                 timerRegen = 0;
             }
-            if(IsKeyDown(KEY_W) && !IsKeyDown(KEY_LEFT_SHIFT)){
+            if(IsKeyDown(KEY_W) && (!IsKeyDown(KEY_LEFT_SHIFT) || player.stamina <= 0)){
                 player.position = movementRequestS('y', -player.stats.agility  * 2 - 15, player.position);
                 
             }else if(IsKeyDown(KEY_W) && IsKeyDown(KEY_LEFT_SHIFT) && player.stamina >= 0){
@@ -340,7 +358,7 @@ int main(void)
                 player.stamina -= 2;
                 timerRegen = 0;
             }
-            if(IsKeyDown(KEY_S) && !IsKeyDown(KEY_LEFT_SHIFT)){
+            if(IsKeyDown(KEY_S) && (!IsKeyDown(KEY_LEFT_SHIFT) || player.stamina <= 0)){
                 player.position = movementRequestS('y', player.stats.agility  * 2 + 15, player.position);
                 
             }else if(IsKeyDown(KEY_S) && IsKeyDown(KEY_LEFT_SHIFT) && player.stamina >= 0){
@@ -352,19 +370,38 @@ int main(void)
             timerWalk = 0;
        }
        //playermovement when pressing the keys
-       if(IsKeyPressed(KEY_D)){
-           player.position = movementRequestS('x', player.stats.agility  * 2 +  15, player.position);
-       }
-       if(IsKeyPressed(KEY_A)){
-           player.position = movementRequestS('x', -player.stats.agility  * 2 - 15, player.position);
-       }
-       if(IsKeyPressed(KEY_W)){
-           player.position = movementRequestS('y', -player.stats.agility  * 2 - 15, player.position);
-       }
-       if(IsKeyPressed(KEY_S)){
-           player.position = movementRequestS('y', player.stats.agility  * 2 +  15, player.position);
-       }
        
+       if(!combat){
+        if(IsKeyPressed(KEY_D)){
+            player.position = movementRequestS('x', player.stats.agility  * 2 +  15, player.position);
+        }
+        if(IsKeyPressed(KEY_A)){
+            player.position = movementRequestS('x', -player.stats.agility  * 2 - 15, player.position);
+        }
+        if(IsKeyPressed(KEY_W)){
+            player.position = movementRequestS('y', -player.stats.agility  * 2 - 15, player.position);
+        }
+        if(IsKeyPressed(KEY_S)){
+            player.position = movementRequestS('y', player.stats.agility  * 2 +  15, player.position);
+        }
+       }else if(player.stamina >= 10){
+            if(IsKeyPressed(KEY_D)){
+                player.position = movementRequestS('x', player.stats.agility  * 2 +  30, player.position);
+                player.stamina -= 10;
+            }
+            if(IsKeyPressed(KEY_A)){
+                player.position = movementRequestS('x', -player.stats.agility  * 2 - 30, player.position);
+                player.stamina -= 10;
+            }
+            if(IsKeyPressed(KEY_W)){
+                player.position = movementRequestS('y', -player.stats.agility  * 2 - 30, player.position);
+                player.stamina -= 10;
+            }
+            if(IsKeyPressed(KEY_S)){
+                player.position = movementRequestS('y', player.stats.agility  * 2 +  30, player.position);
+                player.stamina -= 10;
+            }
+       }
        
        if(currentSpell != NULL && currentSpell->manaConsumption <= player.mana && currentSpell->spellType == 'a'){
        if((IsKeyPressed(KEY_RIGHT) && IsKeyPressed(KEY_UP))){
@@ -409,18 +446,23 @@ int main(void)
            projectiles.push_back(ball);
            player.updateMana(-currentSpell->manaConsumption);
        }
-       }else if(currentSpell != NULL && (float)player.maxMana/currentSpell->manaConsumption <= player.mana){
+       }else if(currentSpell != NULL && (float)player.maxMana/currentSpell->manaConsumption <= player.mana && currentSpell->spellType == 'h'){
            if(IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_RIGHT)){
                player.updateMana(-(float)player.maxMana/currentSpell->manaConsumption);
                player.updateHealth(currentSpell->potency);
                healEffect = true;
            }
        }
+       if(target == NULL){
+          camera.target = {lerp(camera.target.x, player.position.x, 0.5 * GetFrameTime()), lerp(camera.target.y, player.position.y, 0.5 * GetFrameTime())}; 
+       }else{
+           camera.target = {lerp(camera.target.x, lerp(player.position.x, target->position.x, 0.5), 0.9 * GetFrameTime()), lerp(camera.target.y, lerp(player.position.y, target->position.y, 0.5), 0.9 * GetFrameTime())}; 
+       }
        
-       camera.target = {lerp(camera.target.x, player.position.x, 1.5 * GetFrameTime()), lerp(camera.target.y, player.position.y, 1.7 * GetFrameTime())};
             
         if(IsKeyPressed(KEY_R)){
-            player.updateHealth(-100); 
+            target = NULL; 
+            combat = false;
         }
         if(IsKeyPressed(KEY_H)){
             player.updateHealth(10);
@@ -437,36 +479,31 @@ int main(void)
             player.updateStat(2,'v');
         }
         
-        if(IsKeyPressed(KEY_ONE)){
-            player.updateStat(2,'m');
-        }
-        if(IsKeyPressed(KEY_TWO)){
-            player.updateStat(2,'e');
-        }
-        if(IsKeyPressed(KEY_THREE)){
-            player.updateStat(2,'a');
-        }
-        if(IsKeyPressed(KEY_FOUR)){
-            player.updateStat(2,'s');
-        }
-        if(IsKeyPressed(KEY_FIVE)){
-            player.updateStat(2,'p');
-        }
-        if(IsKeyPressed(KEY_SIX)){
-            player.updateStat(2,'v');
-        }
+    
         
-        if(IsKeyPressed(KEY_E)){
+        if(IsKeyPressed(KEY_ONE)){
             currentSpell = hotBar.spells[0].spell;
+           // spellList.push_back(hotBar.spells[0]->spell);
         }
-         if(IsKeyPressed(KEY_R)){
+         if(IsKeyPressed(KEY_TWO)){
             currentSpell = hotBar.spells[1].spell;
+            //spellList.push_back(hotBar.spells[1]->spell);
         }
-         if(IsKeyPressed(KEY_F)){
+         if(IsKeyPressed(KEY_THREE)){
             currentSpell = hotBar.spells[2].spell;
+            //spellList.push_back(hotBar.spells[2]->spell);
         }
-         if(IsKeyPressed(KEY_C)){
+         if(IsKeyPressed(KEY_FOUR)){
             currentSpell = hotBar.spells[3].spell;
+           // spellList.push_back(hotBar.spells[3].spell);
+        }
+         if(IsKeyPressed(KEY_FIVE)){
+            currentSpell = hotBar.spells[4].spell;
+            //spellList.push_back(hotBar.spells[4].spell);
+        }
+         if(IsKeyPressed(KEY_SIX)){
+            currentSpell = hotBar.spells[5].spell;
+           // spellList.push_back(hotBar.spells[5].spell);
         }
         
         if(IsKeyPressed(KEY_V)){
@@ -519,17 +556,19 @@ int main(void)
                         }
 
                         DrawTexture(walls[i].texture, walls[i].position.x-190, walls[i].position.y - 185, WHITE);
-                        DrawRectangleLines(walls[i].position.x, walls[i].position.y, walls[i].width, walls[i].height, WHITE);
+                        //DrawRectangleLines(walls[i].position.x, walls[i].position.y, walls[i].width, walls[i].height, WHITE);
                     }
                 if(!playerL){
                     DrawTextureRec(player.texture, player.animRec, vectorSubtraction(&player.position, new Vector2{45,120}), WHITE);
                 }
-                DrawRectangleLines(player.position.x, player.position.y, player.width, player.height, BLACK);
+                //DrawRectangleLines(player.position.x, player.position.y, player.width, player.height, BLACK);
                 //draws the enemies
                 for(int i = 0; i < enemies.size(); i++){
+                    if(&enemies[i] == target){
                     DrawRectangle(enemies[i].position.x, enemies[i].position.y - 30, (((float)enemies[i].health/(float)enemies[i].maxHealth)*enemies[i].width), 20, MAROON);
+                    }
                     DrawTextureEx(enemies[i].sprite, {enemies[i].position.x, enemies[i].position.y}, 0, 9.5, WHITE);
-                    DrawRectangleLines(enemies[i].position.x, enemies[i].position.y, enemies[i].width, enemies[i].height, BLACK);
+                   // DrawRectangleLines(enemies[i].position.x, enemies[i].position.y, enemies[i].width, enemies[i].height, BLACK);
                 }
             
                 for(int i = 0; i < projectiles.size(); i++){
@@ -544,7 +583,7 @@ int main(void)
                          DrawTextureEx(projectiles[i].image, {projectiles[i].position.x, projectiles[i].position.y}, projectiles[i].rotation, 6, WHITE);
                     }
                    
-                    DrawRectangleLines(projectiles[i].position.x, projectiles[i].position.y, projectiles[i].width, projectiles[i].height, BLACK);
+                   // DrawRectangleLines(projectiles[i].position.x, projectiles[i].position.y, projectiles[i].width, projectiles[i].height, BLACK);
                 }
            EndMode2D();
            
@@ -762,23 +801,7 @@ int main(void)
                DrawText("A", 820 + (Circle.width)*0.3, 300 + (Circle.height/2)*0.3, 30, BLACK);
                DrawText("P", 750 + (Circle.width/4)*0.3, 300 + (Circle.height)*0.3, 30, BLACK);
                DrawText("S", 800 + (Circle.width-Circle.width/4)*0.3 , 300 + (Circle.height)*0.3, 30, BLACK);
-               /*
-               DrawCircleV({(sin(34) + (800 + (Circle.width/2)*0.3))*1.2, (cos(34) + (300 + (Circle.height/2)*0.3))*1.2},20, GREEN);
-               DrawCircleV({800 + (Circle.width-Circle.width/4)*0.3 , 300},5,GREEN);
-               DrawCircleV({800, 300 + (Circle.height/2)*0.3 },5,GREEN);
-               DrawCircleV({800 + (Circle.width)*0.3 , 300 + (Circle.height/2)*0.3 },5,GREEN);
-               DrawCircleV({800 + (Circle.width/4)*0.3, 300 + (Circle.height)*0.3 },5,GREEN);
-               DrawCircleV({800 + (Circle.width-Circle.width/4)*0.3 , 300 + (Circle.height)*0.3 },5,GREEN);
-               
-               DrawCircleV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, 5, BLACK);
-               
-               DrawCircleV(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width/4)*0.3 ,300}, ((float)player.stats.mana/100)), 5, BLACK);
-               DrawCircleV(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width-Circle.width/4)*0.3 , 300}, ((float)player.stats.endurence/100)), 5, BLACK);
-               DrawCircleV(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800, 300 + (Circle.height/2)*0.3 }, ((float)player.stats.agility/100)), 5, BLACK);
-               DrawCircleV(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width)*0.3 , 300 + (Circle.height/2)*0.3 }, ((float)player.stats.skill/100)), 5, BLACK);
-               DrawCircleV(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width/4)*0.3, 300 + (Circle.height)*0.3 }, ((float)player.stats.power/100)), 5, BLACK);
-               DrawCircleV(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width-Circle.width/4)*0.3 , 300 + (Circle.height)*0.3 }, ((float)player.stats.vitality/100)), 5, BLACK);
-               */
+
                DrawLineEx(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width/4)*0.3 ,300}, ((float)player.stats.mana/100)), lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width-Circle.width/4)*0.3 , 300}, ((float)player.stats.endurence/100)), 3, BLACK); 
                DrawLineEx(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width-Circle.width/4)*0.3 , 300}, ((float)player.stats.endurence/100)), lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width)*0.3 , 300 + (Circle.height/2)*0.3 }, ((float)player.stats.agility/100)), 3, BLACK); 
                DrawLineEx(lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width)*0.3 , 300 + (Circle.height/2)*0.3 }, ((float)player.stats.agility/100)), lerpV({800 + (Circle.width/2 ) * 0.3, 300 + (Circle.height/2)*0.3}, {800 + (Circle.width-Circle.width/4)*0.3 , 300 + (Circle.height)*0.3 }, ((float)player.stats.skill/100)), 3, BLACK); 
@@ -792,6 +815,7 @@ int main(void)
            
            }
            
+           if(combat || inventoryUI){
            //spell slots (hotbar) and draging
            for(int i =0; i < hotBar.spells.size(); i++){
                 if(!hotBarDrag){
@@ -826,10 +850,12 @@ int main(void)
                   }  
                }
            }
-           DrawText("E", hotBar.spells[0].position.x + hotBar.spells[0].width/2, hotBar.spells[0].position.y + 110, 20, BLACK);
-           DrawText("R", hotBar.spells[1].position.x + hotBar.spells[1].width/2, hotBar.spells[1].position.y + 110, 20, BLACK);
-           DrawText("F", hotBar.spells[2].position.x + hotBar.spells[2].width/2, hotBar.spells[2].position.y + 110, 20, BLACK);
-           DrawText("C", hotBar.spells[3].position.x + hotBar.spells[3].width/2, hotBar.spells[3].position.y + 110, 20, BLACK);
+           DrawText("1", hotBar.spells[0].position.x + hotBar.spells[0].width/2, hotBar.spells[0].position.y + 110, 20, BLACK);
+           DrawText("2", hotBar.spells[1].position.x + hotBar.spells[1].width/2, hotBar.spells[1].position.y + 110, 20, BLACK);
+           DrawText("3", hotBar.spells[2].position.x + hotBar.spells[2].width/2, hotBar.spells[2].position.y + 110, 20, BLACK);
+           DrawText("4", hotBar.spells[3].position.x + hotBar.spells[3].width/2, hotBar.spells[3].position.y + 110, 20, BLACK);
+           DrawText("5", hotBar.spells[4].position.x + hotBar.spells[4].width/2, hotBar.spells[4].position.y + 110, 20, BLACK);
+           DrawText("6", hotBar.spells[5].position.x + hotBar.spells[5].width/2, hotBar.spells[5].position.y + 110, 20, BLACK);
            if(hotBarDrag){
                dragPos.x += GetMouseDelta().x;
                dragPos.y += GetMouseDelta().y;
@@ -843,6 +869,7 @@ int main(void)
            
            if(IsMouseButtonReleased(0) && hotBarDrag){
                 hotBarDrag = false;
+           }
            }
            
         //ends the drawing phase of the program     
@@ -912,8 +939,12 @@ Vector2 movementRequestS(char axis, int amount, Vector2 position){
        //return statement that does nothing to make the compiler happy
        return {0,0};
 }
-
-void DrawParticle(){
-    
+/*
+void spellCast(Spell spell){
+    if( currentSpell->spellType == 'h'){
+               player.updateMana(-(float)player.maxMana/currentSpell->manaConsumption);
+               player.updateHealth(currentSpell->potency);
+               healEffect = true;
+    }
 }
-
+*/
