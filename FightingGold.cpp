@@ -67,7 +67,7 @@ char playerStat[50];
 
 std::vector<Wall> walls;
 std::vector<projectile> projectiles;
-std::vector<Spell> spellList;
+std::vector<Spell*> spellList;
 std::vector<Enemy> enemies;
 
 // used to render the level or main menu
@@ -483,27 +483,27 @@ int main(void)
         
         if(IsKeyPressed(KEY_ONE)){
             currentSpell = hotBar.spells[0].spell;
-           // spellList.push_back(hotBar.spells[0]->spell);
+            spellList.push_back(hotBar.spells[0].spell);
         }
          if(IsKeyPressed(KEY_TWO)){
             currentSpell = hotBar.spells[1].spell;
-            //spellList.push_back(hotBar.spells[1]->spell);
+            spellList.push_back(hotBar.spells[1].spell);
         }
          if(IsKeyPressed(KEY_THREE)){
             currentSpell = hotBar.spells[2].spell;
-            //spellList.push_back(hotBar.spells[2]->spell);
+            spellList.push_back(hotBar.spells[2].spell);
         }
          if(IsKeyPressed(KEY_FOUR)){
             currentSpell = hotBar.spells[3].spell;
-           // spellList.push_back(hotBar.spells[3].spell);
+            spellList.push_back(hotBar.spells[3].spell);
         }
          if(IsKeyPressed(KEY_FIVE)){
             currentSpell = hotBar.spells[4].spell;
-            //spellList.push_back(hotBar.spells[4].spell);
+            spellList.push_back(hotBar.spells[4].spell);
         }
          if(IsKeyPressed(KEY_SIX)){
             currentSpell = hotBar.spells[5].spell;
-           // spellList.push_back(hotBar.spells[5].spell);
+            spellList.push_back(hotBar.spells[5].spell);
         }
         
         if(IsKeyPressed(KEY_V)){
@@ -939,12 +939,12 @@ Vector2 movementRequestS(char axis, int amount, Vector2 position){
        //return statement that does nothing to make the compiler happy
        return {0,0};
 }
-/*
+
 void spellCast(Spell spell){
-    if( currentSpell->spellType == 'h'){
-               player.updateMana(-(float)player.maxMana/currentSpell->manaConsumption);
-               player.updateHealth(currentSpell->potency);
-               healEffect = true;
+    if(spell->manaConsumption <= player.mana && currentSpell->spellType == 'a'){      
+       projectile ball({player.position.x + player.width, player.position.y + player.height/2}, currentSpell->range, NORTHEAST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 315);
+       player.updateMana(-currentSpell->manaConsumption);
+       projectiles.push_back(ball);
     }
 }
-*/
+
