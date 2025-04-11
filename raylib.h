@@ -229,7 +229,7 @@ typedef struct Vector2 {
 Vector2 lerpV(Vector2 start, Vector2 end, float t){ return {lerp(start.x, end.x, t), lerp(start.y, end.y, t)}; }
 
 //return the sum of each axis as a Vector2
-Vector2 vectorAddition(Vector2 *a, Vector2 *b){return{a->x + b->x, a->y + b->y};}
+Vector2 vectorAddition(Vector2 a, Vector2 b){return{a.x + b.x, a.y + b.y};}
 //return the difference of each axis as a Vector2
 Vector2 vectorSubtraction(Vector2 *a, Vector2 *b){return{a->x - b->x, a->y - b->y};}
 //returns the distance between two points(vector2) as a float

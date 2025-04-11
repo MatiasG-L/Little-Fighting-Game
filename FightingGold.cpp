@@ -157,14 +157,14 @@ int main(void)
     
     std::cout << "\n(WALLS: " <<  walls.size() << ")\n";
         
-    Spell fireBall('a', 20, 25, 'f', "Fire Ball", 'p', 20, 500, "Sprites/Icons/Flame.png", "Sprites/Objects/FireBall.png");// creates a spell
-    Spell waterBall('a', 20, 25, 'w', "Water Ball", 'p', 20, 600, "Sprites/Icons/WaterDrop.png", "Sprites/Objects/WaterBall.png");// creates a spell
-    Spell lightningBolt('a', 30, 45, 'l', "Lightning Bolt", 'b', 70, 1000, "Sprites/Icons/LightningBolt.png", "Sprites/Objects/LightingBolt.png");// creates a spell
-    Spell Spike('a', 90, 50, 's', "Earth Spike", 'p', 40, 800, "Sprites/Icons/Spike.png", "Sprites/Objects/RockSpike.png");// creates a spell
-    Spell lightningSpear('a', 150, 60, 'l', "Lightning Spear", 'b',/*speed*/ 100, 1200, "Sprites/Icons/LightningSpear.png", "Sprites/Objects/LightningSpear.png");// creates a spell
-    Spell waterSpear('a', 30, 70, 'w', "Water Spear", 'b',/*speed*/ 50, 900, "Sprites/Icons/WaterSpear.png", "Sprites/Objects/WaterSpear.png");// creates a spell
-    Spell rock('a', 20, 30, 's', "Rock", 'b',/*speed*/ 20, 700, "Sprites/Icons/Rock.png", "Sprites/Objects/Rock.png");// creates a spell
-    Spell fireArrow('a', 160, 65, 'f', "Rock", 'b',/*speed*/ 20, 700, "Sprites/Icons/FireArrow.png", "Sprites/Objects/FireArrow.png");// creates a spell
+    Spell fireBall('a', 20, 25, 'f', "Fire Ball", 'p',/*speed*/ 10, 500, "Sprites/Icons/Flame.png", "Sprites/Objects/FireBall.png");// creates a spell
+    Spell waterBall('a', 20, 25, 'w', "Water Ball", 'p',/*speed*/ 10, 600, "Sprites/Icons/WaterDrop.png", "Sprites/Objects/WaterBall.png");// creates a spell
+    Spell lightningBolt('a', 30, 45, 'l', "Lightning Bolt", 'b',/*speed*/ 30, 1000, "Sprites/Icons/LightningBolt.png", "Sprites/Objects/LightingBolt.png");// creates a spell
+    Spell Spike('a', 90, 50, 's', "Earth Spike", 'p',/*speed*/ 20, 800, "Sprites/Icons/Spike.png", "Sprites/Objects/RockSpike.png");// creates a spell
+    Spell lightningSpear('a', 150, 60, 'l', "Lightning Spear", 'b',/*speed*/ 40, 1200, "Sprites/Icons/LightningSpear.png", "Sprites/Objects/LightningSpear.png");// creates a spell
+    Spell waterSpear('a', 30, 70, 'w', "Water Spear", 'b',/*speed*/ 25, 900, "Sprites/Icons/WaterSpear.png", "Sprites/Objects/WaterSpear.png");// creates a spell
+    Spell rock('a', 20, 30, 's', "Rock", 'b',/*speed*/ 5, 700, "Sprites/Icons/Rock.png", "Sprites/Objects/Rock.png");// creates a spell
+    Spell fireArrow('a', 160, 65, 'f', "Rock", 'b',/*speed*/ 15, 700, "Sprites/Icons/FireArrow.png", "Sprites/Objects/FireArrow.png");// creates a spell
     
     Spell weakHeal('h', 10, 10, 'h', "Weak Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/WeakHeal.png", "Sprites/Icons/Clear.png");// creates a healing spell
     Spell lightHeal('h', 20, 8, 'h', "Light Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/LightHeal.png", "Sprites/Icons/Clear.png");// creates a healing spell
@@ -300,7 +300,7 @@ int main(void)
             for(int j = 0; j < enemies.size(); j++){
                 if(CheckCollisionRecs({projectiles[i].position.x, projectiles[i].position.y, projectiles[i].width,    projectiles[i].height},{enemies[j].position.x, enemies[j].position.y, enemies[j].width, enemies[j].height})){
                     
-                    enemies[j].position = vectorAddition(&enemies[j].position, &projectiles[i].velocity);
+                    enemies[j].position = vectorAddition(enemies[j].position, projectiles[i].velocity);
                     enemies[j].damage(projectiles[i].power * (1 + (float)player.stats.power * 0.1), projectiles[i].SPfactor);
                     projectiles.erase(projectiles.begin() + i);
                     i--;
@@ -405,44 +405,44 @@ int main(void)
        
        if(currentSpell != NULL && currentSpell->manaConsumption <= player.mana && currentSpell->spellType == 'a'){
        if((IsKeyPressed(KEY_RIGHT) && IsKeyPressed(KEY_UP))){
-           projectile ball({player.position.x + player.width, player.position.y + player.height/2 -50}, currentSpell->range, NORTHEAST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 315);
+           projectile ball(player.center(), currentSpell->range, NORTHEAST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 315, currentSpell->speed);
            player.updateMana(-currentSpell->manaConsumption);
            projectiles.push_back(ball);
        }
        else if(IsKeyPressed(KEY_RIGHT) && IsKeyPressed(KEY_DOWN)){
-           projectile ball({player.position.x + player.width, player.position.y + player.height/2 + 50}, currentSpell->range, SOUTHEAST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 45);
+           projectile ball(player.center(), currentSpell->range, SOUTHEAST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 45, currentSpell->speed);
           player.updateMana(-currentSpell->manaConsumption);
            projectiles.push_back(ball);
        }
        else if(IsKeyPressed(KEY_LEFT) && IsKeyPressed(KEY_DOWN)){
-           projectile ball({player.position.x + 20, player.position.y + player.height}, currentSpell->range, SOUTHWEST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 135);
+           projectile ball(player.center(), currentSpell->range, SOUTHWEST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 135, currentSpell->speed);
            player.updateMana(-currentSpell->manaConsumption);
            projectiles.push_back(ball);
        }
        else if(IsKeyPressed(KEY_LEFT) && IsKeyPressed(KEY_UP)){
-           projectile ball({player.position.x , player.position.y + player.height/2 }, currentSpell->range, NORTHWEST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 225);
+           projectile ball(player.center(), currentSpell->range, NORTHWEST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 225, currentSpell->speed);
            player.updateMana(-currentSpell->manaConsumption);
            projectiles.push_back(ball);
        }
        else if(IsKeyPressed(KEY_RIGHT)){
            
-           projectile ball({player.position.x + player.width, player.position.y + player.height/2}, currentSpell->range, EAST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 0);
+           projectile ball(player.center(), currentSpell->range, EAST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 0, currentSpell->speed);
            player.updateMana(-currentSpell->manaConsumption);
            projectiles.push_back(ball);
        }
        else if(IsKeyPressed(KEY_LEFT)){
-           projectile ball({player.position.x, player.position.y + player.height/2 }, currentSpell->range, WEST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 180);
+           projectile ball(player.center(), currentSpell->range, WEST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 180, currentSpell->speed);
            player.updateMana(-currentSpell->manaConsumption);
            projectiles.push_back(ball);
        }
        else if(IsKeyPressed(KEY_UP)){
-           projectile ball({player.position.x, player.position.y}, currentSpell->range, NORTH(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 100, currentSpell->shoot , 270);
+           projectile ball(player.center(), currentSpell->range, NORTH(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 100, currentSpell->shoot , 270, currentSpell->speed);
            player.updateMana(-currentSpell->manaConsumption);
            projectiles.push_back(ball);
        }
        else if(IsKeyPressed(KEY_DOWN)){
           
-           projectile ball({player.position.x, player.position.y + player.height}, currentSpell->range, SOUTH(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 100, currentSpell->shoot , 90);
+           projectile ball(player.center(), currentSpell->range, SOUTH(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 100, currentSpell->shoot , 90, currentSpell->speed);
            projectiles.push_back(ball);
            player.updateMana(-currentSpell->manaConsumption);
        }
@@ -514,8 +514,11 @@ int main(void)
         }
         
         for(int i = 0; i<projectiles.size(); i++){
-            if(CheckCollisionPointCircle({projectiles[i].position.x, projectiles[i].position.y}, projectiles[i].start, projectiles[i].range)){
-                projectiles[i].position = vectorAddition(&projectiles[i].position, &projectiles[i].velocity);
+            if(CheckCollisionPointCircle({projectiles[i].position.x, projectiles[i].position.y}, projectiles[i].start, projectiles[i].range) && target != NULL){
+                
+                projectiles[i].position = lerpV(projectiles[i].position, target->center(), projectiles[i].speed*0.01);
+                if(target != NULL)projectiles[i].rotation = (float)(atan2((double)target->center().y - (double)player.center().y, (double)target->center().x - (double)player.center().x)*(180/PI));
+                
             }else{
                 projectiles.erase(projectiles.begin() + i);
             }
@@ -939,12 +942,13 @@ Vector2 movementRequestS(char axis, int amount, Vector2 position){
        //return statement that does nothing to make the compiler happy
        return {0,0};
 }
-/*
+
 void spellCast(Spell spell){
-    if( currentSpell->spellType == 'h'){
+    if(currentSpell->spellType == 'h'){
                player.updateMana(-(float)player.maxMana/currentSpell->manaConsumption);
                player.updateHealth(currentSpell->potency);
                healEffect = true;
     }
+    
 }
-*/
+
