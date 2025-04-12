@@ -57,6 +57,8 @@ Player player;// creation the player object
 Vector2 movementRequestS(char axis, int amountY, Vector2 position);
 //function to handle vector addition because ofc you cant just += them
 Vector2 vectorAddition(Vector2 *a, Vector2 *b);
+//handles spell casting taking a spell as a paramater
+void spellCast(Spell spell);
 
 char playerHealth[50];
 char playerMana[50];
@@ -403,56 +405,7 @@ int main(void)
             }
        }
        
-       if(currentSpell != NULL && currentSpell->manaConsumption <= player.mana && currentSpell->spellType == 'a'){
-       if((IsKeyPressed(KEY_RIGHT) && IsKeyPressed(KEY_UP))){
-           projectile ball(player.center(), currentSpell->range, NORTHEAST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 315, currentSpell->speed);
-           player.updateMana(-currentSpell->manaConsumption);
-           projectiles.push_back(ball);
-       }
-       else if(IsKeyPressed(KEY_RIGHT) && IsKeyPressed(KEY_DOWN)){
-           projectile ball(player.center(), currentSpell->range, SOUTHEAST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 45, currentSpell->speed);
-          player.updateMana(-currentSpell->manaConsumption);
-           projectiles.push_back(ball);
-       }
-       else if(IsKeyPressed(KEY_LEFT) && IsKeyPressed(KEY_DOWN)){
-           projectile ball(player.center(), currentSpell->range, SOUTHWEST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 135, currentSpell->speed);
-           player.updateMana(-currentSpell->manaConsumption);
-           projectiles.push_back(ball);
-       }
-       else if(IsKeyPressed(KEY_LEFT) && IsKeyPressed(KEY_UP)){
-           projectile ball(player.center(), currentSpell->range, NORTHWEST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 225, currentSpell->speed);
-           player.updateMana(-currentSpell->manaConsumption);
-           projectiles.push_back(ball);
-       }
-       else if(IsKeyPressed(KEY_RIGHT)){
-           
-           projectile ball(player.center(), currentSpell->range, EAST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 0, currentSpell->speed);
-           player.updateMana(-currentSpell->manaConsumption);
-           projectiles.push_back(ball);
-       }
-       else if(IsKeyPressed(KEY_LEFT)){
-           projectile ball(player.center(), currentSpell->range, WEST(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 60, currentSpell->shoot , 180, currentSpell->speed);
-           player.updateMana(-currentSpell->manaConsumption);
-           projectiles.push_back(ball);
-       }
-       else if(IsKeyPressed(KEY_UP)){
-           projectile ball(player.center(), currentSpell->range, NORTH(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 100, currentSpell->shoot , 270, currentSpell->speed);
-           player.updateMana(-currentSpell->manaConsumption);
-           projectiles.push_back(ball);
-       }
-       else if(IsKeyPressed(KEY_DOWN)){
-          
-           projectile ball(player.center(), currentSpell->range, SOUTH(currentSpell->speed), currentSpell->potency, currentSpell->SPfactor, 60, 100, currentSpell->shoot , 90, currentSpell->speed);
-           projectiles.push_back(ball);
-           player.updateMana(-currentSpell->manaConsumption);
-       }
-       }else if(currentSpell != NULL && (float)player.maxMana/currentSpell->manaConsumption <= player.mana && currentSpell->spellType == 'h'){
-           if(IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_RIGHT)){
-               player.updateMana(-(float)player.maxMana/currentSpell->manaConsumption);
-               player.updateHealth(currentSpell->potency);
-               healEffect = true;
-           }
-       }
+       
        if(target == NULL){
           camera.target = {lerp(camera.target.x, player.position.x, 0.5 * GetFrameTime()), lerp(camera.target.y, player.position.y, 0.5 * GetFrameTime())}; 
        }else{
@@ -483,26 +436,32 @@ int main(void)
         
         if(IsKeyPressed(KEY_ONE)){
             currentSpell = hotBar.spells[0].spell;
-           // spellList.push_back(hotBar.spells[0]->spell);
+            spellCast(*currentSpell);
+            // spellList.push_back(hotBar.spells[0]->spell);
         }
          if(IsKeyPressed(KEY_TWO)){
             currentSpell = hotBar.spells[1].spell;
+            spellCast(*currentSpell);
             //spellList.push_back(hotBar.spells[1]->spell);
         }
          if(IsKeyPressed(KEY_THREE)){
             currentSpell = hotBar.spells[2].spell;
+            spellCast(*currentSpell);
             //spellList.push_back(hotBar.spells[2]->spell);
         }
          if(IsKeyPressed(KEY_FOUR)){
             currentSpell = hotBar.spells[3].spell;
+            spellCast(*currentSpell);
            // spellList.push_back(hotBar.spells[3].spell);
         }
          if(IsKeyPressed(KEY_FIVE)){
             currentSpell = hotBar.spells[4].spell;
+            spellCast(*currentSpell);
             //spellList.push_back(hotBar.spells[4].spell);
         }
          if(IsKeyPressed(KEY_SIX)){
             currentSpell = hotBar.spells[5].spell;
+            spellCast(*currentSpell);
            // spellList.push_back(hotBar.spells[5].spell);
         }
         
@@ -610,6 +569,9 @@ int main(void)
            DrawRectangle(50, 150, (((float)player.stamina/(float)player.maxStamina) * lerp(500, 1500, (float)player.stats.endurence/100)), 40, DARKGREEN);
            DrawRectangleLinesEx({50, 150, lerp(500, 1500, (float)player.stats.endurence/100), 40}, 2,BLACK);
            DrawText(playerStamina, 60, 160, 20, BLACK);
+           
+           DrawRectangleLinesEx({1000, 100, 120, 50}, 2, BLACK);
+           DrawText("Your Turn", 1000, 110, 20, BLACK);
            
            //inventory drawing and draging  
            if(inventoryUI){
@@ -944,11 +906,16 @@ Vector2 movementRequestS(char axis, int amount, Vector2 position){
 }
 
 void spellCast(Spell spell){
-    if(currentSpell->spellType == 'h'){
-               player.updateMana(-(float)player.maxMana/currentSpell->manaConsumption);
-               player.updateHealth(currentSpell->potency);
+    if(spell.spellType == 'h' && (float)player.maxMana/spell.manaConsumption <= player.mana){
+               player.updateMana(-(float)player.maxMana/spell.manaConsumption);
+               player.updateHealth(spell.potency);
                healEffect = true;
+    }else if(spell.spellType == 'a'&& spell.manaConsumption <= player.mana){
+        projectile ball(player.center(), spell.range, NORTHWEST(spell.speed), spell.potency, spell.SPfactor, 60, 60, spell.shoot , 0, currentSpell->speed);
+        player.updateMana(-spell.manaConsumption);
+        projectiles.push_back(ball);
     }
+    
     
 }
 
