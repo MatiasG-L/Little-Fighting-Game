@@ -1,6 +1,9 @@
 #include "raylib.h"
+#include "spell.h"
+#include <vector>
 class Enemy{
     public:
+    std::vector<Spell> moves;
     Vector2 position;
     int width;
     int height;
@@ -26,7 +29,7 @@ class Enemy{
     }
     
     void damage(int amount, char weakness){
-    if(this->weakness == weakness) {amount *= 2; std::cout << "\nWEAKNESS\n";}
+    if(this->weakness == weakness) {amount *= 1.5; std::cout << "\nWEAKNESS\n";}
         health -= amount;
     }
     

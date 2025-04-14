@@ -159,21 +159,21 @@ int main(void)
     
     std::cout << "\n(WALLS: " <<  walls.size() << ")\n";
         
-    Spell fireBall('a', 20, 25, 'f', "Fire Ball", 'p',/*speed*/ 10, 500, "Sprites/Icons/Flame.png", "Sprites/Objects/FireBall.png");// creates a spell
-    Spell waterBall('a', 20, 25, 'w', "Water Ball", 'p',/*speed*/ 10, 600, "Sprites/Icons/WaterDrop.png", "Sprites/Objects/WaterBall.png");// creates a spell
-    Spell lightningBolt('a', 30, 45, 'l', "Lightning Bolt", 'b',/*speed*/ 30, 1000, "Sprites/Icons/LightningBolt.png", "Sprites/Objects/LightingBolt.png");// creates a spell
-    Spell Spike('a', 90, 50, 's', "Earth Spike", 'p',/*speed*/ 20, 800, "Sprites/Icons/Spike.png", "Sprites/Objects/RockSpike.png");// creates a spell
-    Spell lightningSpear('a', 150, 60, 'l', "Lightning Spear", 'b',/*speed*/ 40, 1200, "Sprites/Icons/LightningSpear.png", "Sprites/Objects/LightningSpear.png");// creates a spell
-    Spell waterSpear('a', 30, 70, 'w', "Water Spear", 'b',/*speed*/ 25, 900, "Sprites/Icons/WaterSpear.png", "Sprites/Objects/WaterSpear.png");// creates a spell
-    Spell rock('a', 20, 30, 's', "Rock", 'b',/*speed*/ 5, 700, "Sprites/Icons/Rock.png", "Sprites/Objects/Rock.png");// creates a spell
-    Spell fireArrow('a', 160, 65, 'f', "Rock", 'b',/*speed*/ 15, 700, "Sprites/Icons/FireArrow.png", "Sprites/Objects/FireArrow.png");// creates a spell
+    Spell fireBall('a', 20, 25, 'f', "Fire Ball", 'p',/*speed*/ 10, 500, "Sprites/Icons/Flame.png", "Sprites/Objects/FireBall.png",1.5);// creates a spell
+    Spell waterBall('a', 20, 25, 'w', "Water Ball", 'p',/*speed*/ 10, 600, "Sprites/Icons/WaterDrop.png", "Sprites/Objects/WaterBall.png",1.4);// creates a spell
+    Spell lightningBolt('a', 30, 45, 'l', "Lightning Bolt", 'b',/*speed*/ 30, 1000, "Sprites/Icons/LightningBolt.png", "Sprites/Objects/LightingBolt.png",1.8);// creates a spell
+    Spell Spike('a', 90, 50, 's', "Earth Spike", 'p',/*speed*/ 20, 800, "Sprites/Icons/Spike.png", "Sprites/Objects/RockSpike.png",5);// creates a spell
+    Spell lightningSpear('a', 150, 60, 'l', "Lightning Spear", 'b',/*speed*/ 40, 1200, "Sprites/Icons/LightningSpear.png", "Sprites/Objects/LightningSpear.png",3);// creates a spell
+    Spell waterSpear('a', 30, 70, 'w', "Water Spear", 'b',/*speed*/ 25, 900, "Sprites/Icons/WaterSpear.png", "Sprites/Objects/WaterSpear.png",3.5);// creates a spell
+    Spell rock('a', 20, 30, 's', "Rock", 'b',/*speed*/ 5, 700, "Sprites/Icons/Rock.png", "Sprites/Objects/Rock.png",2);// creates a spell
+    Spell fireArrow('a', 160, 65, 'f', "Fire Arrow", 'b',/*speed*/ 15, 700, "Sprites/Icons/FireArrow.png", "Sprites/Objects/FireArrow.png",4);// creates a spell
     
-    Spell weakHeal('h', 10, 10, 'h', "Weak Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/WeakHeal.png", "Sprites/Icons/Clear.png");// creates a healing spell
-    Spell lightHeal('h', 20, 8, 'h', "Light Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/LightHeal.png", "Sprites/Icons/Clear.png");// creates a healing spell
-    Spell midHeal('h', 40, 6, 'h', "Mid Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/MidHeal.png", "Sprites/Icons/Clear.png");// creates a healing spell
-    Spell strongHeal('h', 60, 4, 'h', "Strong Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/StrongHeal.png", "Sprites/Icons/Clear.png");// creates a healing spell
-    Spell superHeal('h', 100, 2, 'h', "Super Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/SuperHeal.png", "Sprites/Icons/Clear.png");// creates a healing spell
-    Spell fullHeal('h', 10000, 1, 'h', "Full Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/FullHeal.png", "Sprites/Icons/Clear.png");// creates a healing spell
+    Spell weakHeal('h', 10, 10, 'h', "Weak Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/WeakHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
+    Spell lightHeal('h', 20, 8, 'h', "Light Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/LightHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
+    Spell midHeal('h', 40, 6, 'h', "Mid Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/MidHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
+    Spell strongHeal('h', 60, 4, 'h', "Strong Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/StrongHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
+    Spell superHeal('h', 100, 2, 'h', "Super Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/SuperHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
+    Spell fullHeal('h', 10000, 1, 'h', "Full Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/FullHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
     
     Slot slot1({0, 0}, 100, 100, &fireBall);
     Slot slot2({0, 0}, 100, 100, &waterBall);
@@ -222,17 +222,15 @@ int main(void)
      inventory.spells.push_back(slot13);// adds the created spell to the spells vector in the inventory
      inventory.spells.push_back(slot14);// adds the created spell to the spells vector in the inventory
     
-     
-    
-     Enemy dum({300, 700}, 150, 150, 300, 300, 50, 50, Dummy, 'f',250);
-     Enemy dum1({500, 900}, 150, 150, 300, 300, 50, 50, Dummy, 'f',250);
-     Enemy dum2({0, 100}, 150, 150, 300, 300, 50, 50, Dummy, 'w',250);
-     Enemy dum3({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w', 250);
-     Enemy dum4({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w', 250);
-     Enemy dum5({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w', 250);
-     Enemy dum6({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w', 250);
-     Enemy dum7({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w', 250);
-     Enemy dum8({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, 50, Dummy, 'w', 250);
+     Enemy dum({300, 700}, 150, 150, 300, 300, 50, GetRandomValue(40,100), Dummy, 'f',250);
+     Enemy dum1({500, 900}, 150, 150, 300, 300, 50, GetRandomValue(40,100), Dummy, 'f',250);
+     Enemy dum2({0, 100}, 150, 150, 300, 300, 50, GetRandomValue(40,100), Dummy, 'w',250);
+     Enemy dum3({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, GetRandomValue(40,100), Dummy, 'w', 250);
+     Enemy dum4({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, GetRandomValue(40,100), Dummy, 'w', 250);
+     Enemy dum5({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, GetRandomValue(40,100), Dummy, 'w', 250);
+     Enemy dum6({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, GetRandomValue(40,100), Dummy, 'w', 250);
+     Enemy dum7({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, GetRandomValue(40,100), Dummy, 'w', 250);
+     Enemy dum8({(float)GetRandomValue(0,900), (float)GetRandomValue(0,900)}, 150, 150, 300, 300, 50, GetRandomValue(40,100), Dummy, 'w', 250);
      enemies.push_back(dum);
      enemies.push_back(dum1);
      enemies.push_back(dum2);
@@ -242,8 +240,6 @@ int main(void)
      enemies.push_back(dum6);
      enemies.push_back(dum7);
      enemies.push_back(dum8);
-     
-     
 
     for(int i = 0; i<inventory.spells.size(); i++){
         inventory.spells[i].spell->texture.width = 100;
@@ -300,9 +296,10 @@ int main(void)
         //projectile collision
         for(int i = 0; i < projectiles.size();i++){
             for(int j = 0; j < enemies.size(); j++){
-                if(CheckCollisionRecs({projectiles[i].position.x, projectiles[i].position.y, projectiles[i].width,    projectiles[i].height},{enemies[j].position.x, enemies[j].position.y, enemies[j].width, enemies[j].height})){
+                if(CheckCollisionRecs({projectiles[i].position.x, projectiles[i].position.y, projectiles[i].width, projectiles[i].height},{enemies[j].position.x, enemies[j].position.y, enemies[j].width, enemies[j].height})){
                     
-                    enemies[j].position = vectorAddition(enemies[j].position, projectiles[i].velocity);
+                    enemies[j].position.x += ((enemies[j].position.x - midWayPoint(enemies[j].position, player.position).x) * 0.1) * projectiles[i].knockback;
+                    enemies[j].position.y += enemies[j].position.y - midWayPoint(enemies[j].position, player.position).y;
                     enemies[j].damage(projectiles[i].power * (1 + (float)player.stats.power * 0.1), projectiles[i].SPfactor);
                     projectiles.erase(projectiles.begin() + i);
                     i--;
@@ -434,32 +431,32 @@ int main(void)
         
     
         
-        if(IsKeyPressed(KEY_ONE)){
+        if(IsKeyPressed(KEY_ONE) && hotBar.spells[0].spell != NULL){
             currentSpell = hotBar.spells[0].spell;
             spellCast(*currentSpell);
             // spellList.push_back(hotBar.spells[0]->spell);
         }
-         if(IsKeyPressed(KEY_TWO)){
+         if(IsKeyPressed(KEY_TWO) && hotBar.spells[1].spell != NULL){
             currentSpell = hotBar.spells[1].spell;
             spellCast(*currentSpell);
             //spellList.push_back(hotBar.spells[1]->spell);
         }
-         if(IsKeyPressed(KEY_THREE)){
+         if(IsKeyPressed(KEY_THREE) && hotBar.spells[2].spell != NULL){
             currentSpell = hotBar.spells[2].spell;
             spellCast(*currentSpell);
             //spellList.push_back(hotBar.spells[2]->spell);
         }
-         if(IsKeyPressed(KEY_FOUR)){
+         if(IsKeyPressed(KEY_FOUR) && hotBar.spells[3].spell != NULL){
             currentSpell = hotBar.spells[3].spell;
             spellCast(*currentSpell);
            // spellList.push_back(hotBar.spells[3].spell);
         }
-         if(IsKeyPressed(KEY_FIVE)){
+         if(IsKeyPressed(KEY_FIVE) && hotBar.spells[4].spell != NULL){
             currentSpell = hotBar.spells[4].spell;
             spellCast(*currentSpell);
             //spellList.push_back(hotBar.spells[4].spell);
         }
-         if(IsKeyPressed(KEY_SIX)){
+         if(IsKeyPressed(KEY_SIX) && hotBar.spells[5].spell != NULL){
             currentSpell = hotBar.spells[5].spell;
             spellCast(*currentSpell);
            // spellList.push_back(hotBar.spells[5].spell);
@@ -470,6 +467,9 @@ int main(void)
         }
         if(IsKeyPressed(KEY_N)){
             player.exp(10000);
+        }
+        if(IsKeyPressed(KEY_E)){
+            turn = false;
         }
         
         for(int i = 0; i<projectiles.size(); i++){
@@ -569,10 +569,13 @@ int main(void)
            DrawRectangle(50, 150, (((float)player.stamina/(float)player.maxStamina) * lerp(500, 1500, (float)player.stats.endurence/100)), 40, DARKGREEN);
            DrawRectangleLinesEx({50, 150, lerp(500, 1500, (float)player.stats.endurence/100), 40}, 2,BLACK);
            DrawText(playerStamina, 60, 160, 20, BLACK);
-           
-           DrawRectangleLinesEx({1000, 100, 120, 50}, 2, BLACK);
-           DrawText("Your Turn", 1000, 110, 20, BLACK);
-           
+           if(turn){
+               DrawRectangleLinesEx({50, 200, 130, 40}, 2, BLACK);
+               DrawText("Your Turn", 60, 210, 20, BLACK);
+           }else{
+               DrawRectangleLinesEx({50, 200, 150, 40}, 2, BLACK);
+               DrawText("Oponents Turn", 60, 210, 20, BLACK);
+           }
            //inventory drawing and draging  
            if(inventoryUI){
                //big rectangle for the backdrop used for opening menu
@@ -911,7 +914,7 @@ void spellCast(Spell spell){
                player.updateHealth(spell.potency);
                healEffect = true;
     }else if(spell.spellType == 'a'&& spell.manaConsumption <= player.mana){
-        projectile ball(player.center(), spell.range, NORTHWEST(spell.speed), spell.potency, spell.SPfactor, 60, 60, spell.shoot , 0, currentSpell->speed);
+        projectile ball(player.center(), spell.range, NORTHWEST(spell.speed), spell.potency, spell.SPfactor, 60, 60, spell.shoot , 0, spell.speed ,spell.knockback);
         player.updateMana(-spell.manaConsumption);
         projectiles.push_back(ball);
     }

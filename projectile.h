@@ -12,8 +12,8 @@ class projectile{
     Vector2 start;
     float rotation;
     float speed;
-     
-    projectile(Vector2 position, int range, Vector2 velocity, int power, char SPfactor, int width, int height, Texture2D image, float rotation, float speed){
+    float knockback;
+    projectile(Vector2 position, int range, Vector2 velocity, int power, char SPfactor, int width, int height, Texture2D image, float rotation, float speed, float knockback){
         this->position = position;
         start = position;
         this->range = range;
@@ -25,5 +25,6 @@ class projectile{
         this->image = image;
         this->rotation = rotation;
         this->speed = speed;
+        this->knockback = knockback;
     }
 };
