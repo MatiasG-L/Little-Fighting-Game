@@ -118,8 +118,10 @@ int main(void)
     Texture2D Clear = LoadTexture("Sprites/Icons/Clear.png");
     //Texture loading
     Texture2D PlayerTexture = LoadTexture("Sprites/Player/Player.png");
-    Texture2D PlayerIdle = LoadTexture("Sprites/Player/Player_idle.png");
-    Texture2D PlayerWalk = LoadTexture("Sprites/Player/Player_walk.png");
+    Texture2D PlayerIdleRight = LoadTexture("Sprites/Player/Player_idle_right.png");
+    Texture2D PlayerIdleLeft = LoadTexture("Sprites/Player/Player_idle_left.png");
+    Texture2D PlayerWalkRight = LoadTexture("Sprites/Player/Player_walk_right.png");
+    Texture2D PlayerWalkLeft = LoadTexture("Sprites/Player/Player_walk_left.png");
     Texture2D PlayerCast = LoadTexture("Sprites/Player/Player_cast.png");
     Texture2D TreeTexture = LoadTexture("Sprites/Objects/Tree.png");
     Texture2D FireBarPhy = LoadTexture("Sprites/Objects/FireBall.png");
@@ -127,20 +129,28 @@ int main(void)
     Texture2D Circle = LoadTexture("Sprites/Icons/Circle.png");
     Texture2D PlusButton = LoadTexture("Sprites/Icons/PlusButton.png");
     
-    PlayerIdle.width *= PLAYER_SCALE;
-    PlayerIdle.height *= PLAYER_SCALE;
+    PlayerIdleRight.width *= PLAYER_SCALE;
+    PlayerIdleRight.height *= PLAYER_SCALE;
     
-    PlayerWalk.width *= PLAYER_SCALE;
-    PlayerWalk.height *= PLAYER_SCALE;
+    PlayerIdleLeft.width *= PLAYER_SCALE;
+    PlayerIdleLeft.height *= PLAYER_SCALE;
+    
+    PlayerWalkRight.width *= PLAYER_SCALE;
+    PlayerWalkRight.height *= PLAYER_SCALE;
+    
+    PlayerWalkLeft.width *= PLAYER_SCALE;
+    PlayerWalkLeft.height *= PLAYER_SCALE;
     
     PlayerCast.width *= PLAYER_SCALE;
     PlayerCast.height *= PLAYER_SCALE;
     
-    player.walk = {5, 4, PlayerWalk.width, PlayerWalk.height, "walk"};
-    player.idle = {4, 3, PlayerIdle.width, PlayerIdle.height, "idle"};
+    player.walkR = {5, 4, PlayerWalkRight.width, PlayerWalkRight.height, "walk"};
+    player.walkL = {5, 4, PlayerWalkLeft.width, PlayerWalkLeft.height, "walk"};
+    player.idleR = {4, 3, PlayerIdleRight.width, PlayerIdleRight.height, "idle"};
+    player.idleL = {4, 3, PlayerIdleLeft.width, PlayerIdleLeft.height, "idle"};
     player.cast = {6, 4, PlayerCast.width, PlayerCast.height, "cast"};
     
-    player.changeAnimation("idle", PlayerIdle);
+    player.changeAnimation("idle", PlayerIdleRight);
     
     Wall wall1(200, 200, 165, 300, TreeTexture);
     Wall wall2(700, 200, 165, 300, TreeTexture);
@@ -162,7 +172,7 @@ int main(void)
     Spell fireBall('a', 20, 25, 'f', "Fire Ball", 'p',/*speed*/ 10, 500, "Sprites/Icons/Flame.png", "Sprites/Objects/FireBall.png",1.5);// creates a spell
     Spell waterBall('a', 20, 25, 'w', "Water Ball", 'p',/*speed*/ 10, 600, "Sprites/Icons/WaterDrop.png", "Sprites/Objects/WaterBall.png",1.4);// creates a spell
     Spell lightningBolt('a', 30, 45, 'l', "Lightning Bolt", 'b',/*speed*/ 30, 1000, "Sprites/Icons/LightningBolt.png", "Sprites/Objects/LightingBolt.png",1.8);// creates a spell
-    Spell Spike('a', 90, 50, 's', "Earth Spike", 'p',/*speed*/ 20, 800, "Sprites/Icons/Spike.png", "Sprites/Objects/RockSpike.png",5);// creates a spell
+    Spell Spike('a', 90, 50, 's', "Earth Spike", 'p',/*speed*/ 20, 800, "Sprites/Icons/Spike.png", "Sprites/Objects/RockSpike.png",6);// creates a spell
     Spell lightningSpear('a', 150, 60, 'l', "Lightning Spear", 'b',/*speed*/ 40, 1200, "Sprites/Icons/LightningSpear.png", "Sprites/Objects/LightningSpear.png",3);// creates a spell
     Spell waterSpear('a', 30, 70, 'w', "Water Spear", 'b',/*speed*/ 25, 900, "Sprites/Icons/WaterSpear.png", "Sprites/Objects/WaterSpear.png",3.5);// creates a spell
     Spell rock('a', 20, 30, 's', "Rock", 'b',/*speed*/ 5, 700, "Sprites/Icons/Rock.png", "Sprites/Objects/Rock.png",2);// creates a spell
@@ -277,6 +287,14 @@ int main(void)
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         
+        if(IsKeyDown(KEY_A)){
+            player.flipped = true;
+            
+        }else if(IsKeyDown(KEY_D)){
+            player.flipped = false;
+        }
+        
+        
         player.animation();
         
         if(timerRegenMana < 0.01){
@@ -299,7 +317,7 @@ int main(void)
                 if(CheckCollisionRecs({projectiles[i].position.x, projectiles[i].position.y, projectiles[i].width, projectiles[i].height},{enemies[j].position.x, enemies[j].position.y, enemies[j].width, enemies[j].height})){
                     
                     enemies[j].position.x += ((enemies[j].position.x - midWayPoint(enemies[j].position, player.position).x) * 0.1) * projectiles[i].knockback;
-                    enemies[j].position.y += enemies[j].position.y - midWayPoint(enemies[j].position, player.position).y;
+                    enemies[j].position.y += ((enemies[j].position.y - midWayPoint(enemies[j].position, player.position).y) * 0.1) * projectiles[i].knockback;
                     enemies[j].damage(projectiles[i].power * (1 + (float)player.stats.power * 0.1), projectiles[i].SPfactor);
                     projectiles.erase(projectiles.begin() + i);
                     i--;
@@ -313,10 +331,20 @@ int main(void)
             }
         }
        
-       if(IsKeyDown(KEY_D) || IsKeyDown(KEY_W) || IsKeyDown(KEY_S) || IsKeyDown(KEY_A)){
-           if(player.currentAnimation != "walk") player.changeAnimation("walk", PlayerWalk);
+       if(IsKeyDown(KEY_D) || IsKeyDown(KEY_W) || IsKeyDown(KEY_S) || IsKeyDown(KEY_A)){           
+                if(player.currentAnimation != "walk"){
+                    if(!player.flipped){
+                        player.changeAnimation("walk", PlayerWalkRight);
+                    }else{
+                        player.changeAnimation("walk", PlayerWalkLeft);
+                    }
+                }
        }else if(player.currentAnimation != "idle"){
-           player.changeAnimation("idle", PlayerIdle);
+           if(!player.flipped){
+                player.changeAnimation("idle", PlayerIdleRight);
+           }else{
+               player.changeAnimation("idle", PlayerIdleLeft);
+           }
        }
        
        
@@ -334,7 +362,7 @@ int main(void)
         }else if(!combat){
             if(IsKeyDown(KEY_D) && (!IsKeyDown(KEY_LEFT_SHIFT) || player.stamina <= 0)){
                 player.position = movementRequestS('x', player.stats.agility  * 2 + 15, player.position);
-                
+                player.flipped = false;
                 
             }else if(IsKeyDown(KEY_D) && IsKeyDown(KEY_LEFT_SHIFT) && player.stamina >= 0){
                 player.position = movementRequestS('x', player.stats.agility  * 2 + 30, player.position);
@@ -343,7 +371,7 @@ int main(void)
             }
             if(IsKeyDown(KEY_A) && (!IsKeyDown(KEY_LEFT_SHIFT) || player.stamina <= 0)){
                 player.position = movementRequestS('x', -player.stats.agility  * 2 - 15, player.position);
-                
+                player.flipped = true;
             }else if(IsKeyDown(KEY_A) && IsKeyDown(KEY_LEFT_SHIFT) && player.stamina >= 0){
                 player.position = movementRequestS('x', -player.stats.agility  * 2 - 30, player.position);
                 player.stamina -= 2;
@@ -430,36 +458,37 @@ int main(void)
         }
         
     
-        
-        if(IsKeyPressed(KEY_ONE) && hotBar.spells[0].spell != NULL){
-            currentSpell = hotBar.spells[0].spell;
-            spellCast(*currentSpell);
-            // spellList.push_back(hotBar.spells[0]->spell);
-        }
-         if(IsKeyPressed(KEY_TWO) && hotBar.spells[1].spell != NULL){
-            currentSpell = hotBar.spells[1].spell;
-            spellCast(*currentSpell);
-            //spellList.push_back(hotBar.spells[1]->spell);
-        }
-         if(IsKeyPressed(KEY_THREE) && hotBar.spells[2].spell != NULL){
-            currentSpell = hotBar.spells[2].spell;
-            spellCast(*currentSpell);
-            //spellList.push_back(hotBar.spells[2]->spell);
-        }
-         if(IsKeyPressed(KEY_FOUR) && hotBar.spells[3].spell != NULL){
-            currentSpell = hotBar.spells[3].spell;
-            spellCast(*currentSpell);
-           // spellList.push_back(hotBar.spells[3].spell);
-        }
-         if(IsKeyPressed(KEY_FIVE) && hotBar.spells[4].spell != NULL){
-            currentSpell = hotBar.spells[4].spell;
-            spellCast(*currentSpell);
-            //spellList.push_back(hotBar.spells[4].spell);
-        }
-         if(IsKeyPressed(KEY_SIX) && hotBar.spells[5].spell != NULL){
-            currentSpell = hotBar.spells[5].spell;
-            spellCast(*currentSpell);
-           // spellList.push_back(hotBar.spells[5].spell);
+        if(turn && combat){
+            if(IsKeyPressed(KEY_ONE) && hotBar.spells[0].spell != NULL){
+                currentSpell = hotBar.spells[0].spell;
+                spellCast(*currentSpell);
+                // spellList.push_back(hotBar.spells[0]->spell);
+            }
+             if(IsKeyPressed(KEY_TWO) && hotBar.spells[1].spell != NULL){
+                currentSpell = hotBar.spells[1].spell;
+                spellCast(*currentSpell);
+                //spellList.push_back(hotBar.spells[1]->spell);
+            }
+             if(IsKeyPressed(KEY_THREE) && hotBar.spells[2].spell != NULL){
+                currentSpell = hotBar.spells[2].spell;
+                spellCast(*currentSpell);
+                //spellList.push_back(hotBar.spells[2]->spell);
+            }
+             if(IsKeyPressed(KEY_FOUR) && hotBar.spells[3].spell != NULL){
+                currentSpell = hotBar.spells[3].spell;
+                spellCast(*currentSpell);
+               // spellList.push_back(hotBar.spells[3].spell);
+            }
+             if(IsKeyPressed(KEY_FIVE) && hotBar.spells[4].spell != NULL){
+                currentSpell = hotBar.spells[4].spell;
+                spellCast(*currentSpell);
+                //spellList.push_back(hotBar.spells[4].spell);
+            }
+             if(IsKeyPressed(KEY_SIX) && hotBar.spells[5].spell != NULL){
+                currentSpell = hotBar.spells[5].spell;
+                spellCast(*currentSpell);
+               // spellList.push_back(hotBar.spells[5].spell);
+            }
         }
         
         if(IsKeyPressed(KEY_V)){
@@ -469,7 +498,9 @@ int main(void)
             player.exp(10000);
         }
         if(IsKeyPressed(KEY_E)){
-            turn = false;
+            player.mana = player.maxMana;
+            player.stamina = player.maxStamina;
+            turn = !turn;
         }
         
         for(int i = 0; i<projectiles.size(); i++){
@@ -569,11 +600,11 @@ int main(void)
            DrawRectangle(50, 150, (((float)player.stamina/(float)player.maxStamina) * lerp(500, 1500, (float)player.stats.endurence/100)), 40, DARKGREEN);
            DrawRectangleLinesEx({50, 150, lerp(500, 1500, (float)player.stats.endurence/100), 40}, 2,BLACK);
            DrawText(playerStamina, 60, 160, 20, BLACK);
-           if(turn){
+           if(turn && combat){
                DrawRectangleLinesEx({50, 200, 130, 40}, 2, BLACK);
                DrawText("Your Turn", 60, 210, 20, BLACK);
-           }else{
-               DrawRectangleLinesEx({50, 200, 150, 40}, 2, BLACK);
+           }else if(combat){
+               DrawRectangleLinesEx({50, 200, 180, 40}, 2, BLACK);
                DrawText("Oponents Turn", 60, 210, 20, BLACK);
            }
            //inventory drawing and draging  

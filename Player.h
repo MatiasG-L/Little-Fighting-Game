@@ -11,11 +11,15 @@
 
 class Player{
     
+    
+    
     public:
     // player attributes
     float width = 80;
     float height = 90;
     Rectangle Rec; //Rectangle struct used for the DrawRectanglePro function (currently useless i suppose)
+    
+    bool flipped = false;
     
     std::string state = "idle";
     
@@ -51,8 +55,10 @@ class Player{
         std::string name;
     }Animation;
     
-    Animation idle;
-    Animation walk;
+    Animation idleR;
+    Animation walkR;
+    Animation idleL;
+    Animation walkL;
     Animation cast;
     
     typedef struct Stats{
@@ -155,19 +161,19 @@ class Player{
     void changeAnimation(std::string name, Texture2D texture){
        
         if(name == "walk"){
-            frameSpeed = walk.frameSpeed;
-            frameCount = walk.frameCount;
-            animRec = {0,0,(float)walk.width/walk.frameCount, (float)walk.height};
-            aWidth = walk.width;
-            currentAnimation = walk.name;
+            frameSpeed = walkR.frameSpeed;
+            frameCount = walkR.frameCount;
+            animRec = {0,0,(float)walkR.width/walkR.frameCount, (float)walkR.height};
+            aWidth = walkR.width;
+            currentAnimation = walkR.name;
             this->texture = texture;
         }
         if(name == "idle"){
-            frameSpeed = idle.frameSpeed;
-            frameCount = idle.frameCount;
-            animRec = {0,0,(float)idle.width/idle.frameCount, (float)idle.height};
-            aWidth = idle.width;
-            currentAnimation = idle.name;
+            frameSpeed = idleR.frameSpeed;
+            frameCount = idleR.frameCount;
+            animRec = {0,0,(float)idleR.width/idleR.frameCount, (float)idleR.height};
+            aWidth = idleR.width;
+            currentAnimation = idleR.name;
             this->texture = texture;
         }
         if(name == "cast"){
