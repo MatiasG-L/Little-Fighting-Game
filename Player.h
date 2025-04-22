@@ -21,7 +21,7 @@ class Player{
     
     bool flipped = false;
     
-    std::string state = "idle";
+    std::string state = "null";
     
     int maxHealth;
     int health;
@@ -159,13 +159,20 @@ class Player{
     }
     //function that handles the animation change
     void changeAnimation(std::string name, Texture2D texture){
-       
-        if(name == "walk"){
+       if(name == currentAnimation) return;
+        if(name == "walkR"){
             frameSpeed = walkR.frameSpeed;
             frameCount = walkR.frameCount;
             animRec = {0,0,(float)walkR.width/walkR.frameCount, (float)walkR.height};
             aWidth = walkR.width;
             currentAnimation = walkR.name;
+            this->texture = texture;
+        }else if(name == "walkL"){
+            frameSpeed = walkL.frameSpeed;
+            frameCount = walkL.frameCount;
+            animRec = {0,0,(float)walkL.width/walkL.frameCount, (float)walkL.height};
+            aWidth = walkL.width;
+            currentAnimation = walkL.name;
             this->texture = texture;
         }
         if(name == "idle"){

@@ -75,7 +75,7 @@ std::vector<Enemy> enemies;
 // used to render the level or main menu
 bool inventoryUI = false;
 bool stat = false;
-
+bool playerANM = false;
 
 
 typedef struct inventory{
@@ -144,8 +144,8 @@ int main(void)
     PlayerCast.width *= PLAYER_SCALE;
     PlayerCast.height *= PLAYER_SCALE;
     
-    player.walkR = {5, 4, PlayerWalkRight.width, PlayerWalkRight.height, "walk"};
-    player.walkL = {5, 4, PlayerWalkLeft.width, PlayerWalkLeft.height, "walk"};
+    player.walkR = {5, 4, PlayerWalkRight.width, PlayerWalkRight.height, "walkR"};
+    player.walkL = {5, 4, PlayerWalkLeft.width, PlayerWalkLeft.height, "walkL"};
     player.idleR = {4, 3, PlayerIdleRight.width, PlayerIdleRight.height, "idle"};
     player.idleL = {4, 3, PlayerIdleLeft.width, PlayerIdleLeft.height, "idle"};
     player.cast = {6, 4, PlayerCast.width, PlayerCast.height, "cast"};
@@ -286,14 +286,15 @@ int main(void)
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
-        
-        if(IsKeyDown(KEY_A)){
+        /*
+        if(IsKeyDown(KEY_A) && !(IsKeyDown(KEY_A) && IsKeyDown(KEY_D))){
             player.flipped = true;
             
-        }else if(IsKeyDown(KEY_D)){
+        }
+        if(IsKeyDown(KEY_D) && !(IsKeyDown(KEY_A) && IsKeyDown(KEY_D))){
             player.flipped = false;
         }
-        
+        */
         
         player.animation();
         
@@ -331,15 +332,17 @@ int main(void)
             }
         }
        
+       
+       
        if(IsKeyDown(KEY_D) || IsKeyDown(KEY_W) || IsKeyDown(KEY_S) || IsKeyDown(KEY_A)){           
-                if(player.currentAnimation != "walk"){
-                    if(!player.flipped){
-                        player.changeAnimation("walk", PlayerWalkRight);
-                    }else{
-                        player.changeAnimation("walk", PlayerWalkLeft);
-                    }
+                if( !player.flipped){
+                    player.changeAnimation("walkR", PlayerWalkRight);
+                    
+                }else if(player.flipped){
+                    player.changeAnimation("walkL", PlayerWalkLeft);
                 }
-       }else if(player.currentAnimation != "idle"){
+                
+       }else{
            if(!player.flipped){
                 player.changeAnimation("idle", PlayerIdleRight);
            }else{
@@ -517,13 +520,18 @@ int main(void)
 
       
         BeginDrawing();
+        
+        
             
             //anything drawn inside of the BeginMode2D() and EndMode2D() are going to be drawn onto the world and wont move with the camera but anything drawn after EndMode2D() is drawn onto the screen and moves with the camera useful for UI
             BeginMode2D(camera);
             
+                
+            
                 ClearBackground(DARKGREEN);
                 
                 //draws the player
+                
                 
                 if(healEffect){
                     healWidth = lerp(healWidth, 0, 15 * GetFrameTime());
@@ -902,6 +910,12 @@ int main(void)
 Vector2 movementRequestS(char axis, int amount, Vector2 position){
     Vector2 result = position;
     bool colD = false;
+    if(amount < 0 && (axis == 'X' || axis == 'x')){
+        player.flipped = true;
+    }
+    if(amount > 0 && (axis == 'X' || axis == 'x')){
+        player.flipped = false;
+    }
     for(int i = 0; i < walls.size(); i++){
            //returns a Vector2 value for the players new position given the parameters and collisions (x value)
         if(axis == 'X' || axis == 'x'){
