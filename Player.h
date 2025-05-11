@@ -21,7 +21,7 @@ class Player{
     
     bool flipped = false;
     
-    std::string state = "null";
+    std::string state = "NULL";
     
     int maxHealth;
     int health;
@@ -43,7 +43,7 @@ class Player{
     int currentFrame = 0;
     float aWidth;
     Rectangle animRec;
-    std::string currentAnimation = "idle";
+    std::string currentAnimation = "NULL";
     
     Texture2D texture;
     
