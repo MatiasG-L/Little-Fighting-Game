@@ -89,6 +89,7 @@ typedef struct inventory{
  bool healEffect = false;
  float healWidth = 200;
 
+
  int indexI = 0;
  int indexH = 0;
  
@@ -332,10 +333,13 @@ int main(void)
                
                 if(enemies[j].health <= 0){
                     player.exp(enemies[j].value);
+                    target = NULL; 
+                    combat = false;
                     std::cout << "\n" << enemies[j].value << "\n";
                     //enemies.erase(enemies.begin() + j);
                     std::swap(enemies[j], enemies.back());
                     enemies.pop_back();
+                    
                     
                 }
             }

@@ -2,10 +2,10 @@
 #include <iostream>
 
 
-    //---------------------------------------------------------------------------//
-   //  NOTE:                                                                    //            
-  //      the players origin is at the top left corner of the drawn square     //
- //                                                                           // 
+    //--------------------------------------------------------------------------//
+   //  NOTE:                                                                   //            
+  //      the players origin is at the top left corner of the drawn square    //
+ //                                                                          // 
 //--------------------------------------------------------------------------//
 
 
@@ -34,8 +34,12 @@ class Player{
     
     int level = 1;
     int EXP = 0;
-    int nextLevel = 100; 
+    int nextLevel = 100;
     int statPoint = 0;
+    
+    float damgMultiplier = 1;
+    float resistanceMultiplier = 1;
+    bool persistance;
     
     int frameCounter = 0; 
     int frameSpeed = 4; //(fps)
