@@ -186,6 +186,9 @@ int main(void)
     Spell strongHeal('h', 60, 3, 'h', "Strong Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/StrongHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
     Spell superHeal('h', 100, 2, 'h', "Super Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/SuperHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
     Spell fullHeal('h', 10000, 1, 'h', "Full Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/FullHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
+    Spell weakBuffS('b', 0.5, 10, 's', "Weak Strength Buff", '0',/*speed*/ 0, 0, "Sprites/Icons/WeakBuff.png", "Sprites/Icons/Clear.png",0);// creates a buff spell
+    Spell weakBuffE('b', 0.5, 10, 'r', "Weak Endurance Buff", '0',/*speed*/ 0, 0, "Sprites/Icons/WeakBuffEnd.png", "Sprites/Icons/Clear.png",0);// creates a buff spell
+    
     
     Slot slot1({0, 0}, 100, 100, &fireBall);
     Slot slot2({0, 0}, 100, 100, &waterBall);
@@ -201,7 +204,11 @@ int main(void)
     Slot slot11({250, 250}, 100, 100, &midHeal);
     Slot slot12({250, 250}, 100, 100, &strongHeal);
     Slot slot13({250, 250}, 100, 100, &superHeal);
-    Slot slot14({250, 250}, 100, 100, & fullHeal);
+    Slot slot14({250, 250}, 100, 100, &fullHeal);
+    
+    Slot slot15({250, 250}, 100, 100, &weakBuffS);
+    Slot slot16({250, 250}, 100, 100, &weakBuffE);
+    
      inventory inventory;// created an instance for the inventory
      struct inventory hotBar;//created an instance for the hotbar
      
@@ -233,6 +240,8 @@ int main(void)
      inventory.spells.push_back(slot12);// adds the created spell to the spells vector in the inventory
      inventory.spells.push_back(slot13);// adds the created spell to the spells vector in the inventory
      inventory.spells.push_back(slot14);// adds the created spell to the spells vector in the inventory
+     inventory.spells.push_back(slot15);// adds the created spell to the spells vector in the inventory
+     inventory.spells.push_back(slot16);// adds the created spell to the spells vector in the inventory
     //creating a vector to be used as a list of moves that can be used as given to an enemy
     std::vector<Spell> dummyMoves = {weakHeal, waterBall, Spike};
     //creating the enemy objects
@@ -315,7 +324,7 @@ int main(void)
                 if(CheckCollisionRecs({projectiles[i].position.x, projectiles[i].position.y, projectiles[i].width, projectiles[i].height},{enemies[j].position.x, enemies[j].position.y, enemies[j].width, enemies[j].height}) && projectiles[i].freindly){      
                     enemies[j].position.x += ((enemies[j].position.x - midWayPoint(enemies[j].position, player.position).x) * 0.1) * projectiles[i].knockback;
                     enemies[j].position.y += ((enemies[j].position.y - midWayPoint(enemies[j].position, player.position).y) * 0.1) * projectiles[i].knockback;
-                    enemies[j].damage(projectiles[i].power * (1 + (float)player.stats.power * 0.1), projectiles[i].SPfactor);
+                    enemies[j].damage((projectiles[i].power * (1 + (float)player.stats.power * 0.1) *player.damgMultiplier), projectiles[i].SPfactor);
                     //projectiles.erase(projectiles.begin() + i);
                     std::swap(projectiles[i], projectiles.back());
                     projectiles.pop_back();
@@ -543,6 +552,13 @@ int main(void)
             player.mana = player.maxMana;
             player.stamina = player.maxStamina;
             turn = !turn;
+            std::cout<<"\n" << player.damgMultiplier << "\n";
+            if(player.persistance){
+                player.persistance = false;
+            }else{
+                player.damgMultiplier = 1;
+                player.resistanceMultiplier = 1;
+            }
         }
         
         for(int i = 0; i<projectiles.size(); i++){
@@ -1005,6 +1021,24 @@ void spellCast(Spell spell){
         projectile ball(player.center(), spell.range, NORTHWEST(spell.speed), spell.potency, spell.SPfactor, 60, 60, spell.shoot, 0, spell.speed ,spell.knockback);
         if(ball.freindly)player.updateMana(-spell.manaConsumption);
         projectiles.push_back(ball);
+    }else if(spell.spellType == 'b' && (float)player.maxMana/spell.manaConsumption <= player.mana){
+        if(spell.SPfactor == 's'){
+            if(spell.attackType == '1'){
+                player.persistance = true;
+            }else{
+                player.persistance = false;
+            }
+            player.damgMultiplier += spell.potency;
+            player.updateMana(-(float)player.maxMana/spell.manaConsumption);
+        }else if(spell.SPfactor == 'r'){
+            if(spell.attackType == '1'){
+                player.persistance = true;
+            }else{
+                player.persistance = false;
+            }
+            player.resistanceMultiplier += spell.potency;
+            player.updateMana(-(float)player.maxMana/spell.manaConsumption);
+        }
     }
     
     

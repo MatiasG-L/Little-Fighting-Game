@@ -39,7 +39,7 @@ class Player{
     
     float damgMultiplier = 1;
     float resistanceMultiplier = 1;
-    bool persistance;
+    bool persistance = false;
     
     int frameCounter = 0; 
     int frameSpeed = 4; //(fps)

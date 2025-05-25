@@ -8,7 +8,7 @@ class Enemy{
     int width;
     int height;
     int maxHealth;
-    int health;
+    float health;
     int power;
     int value;
     Texture2D sprite;
@@ -19,7 +19,7 @@ class Enemy{
     float DamageScale;
     bool turn;
     
-    Enemy(Vector2 position, int width, int height, int maxHealth, int health, int power, int value, Texture2D sprite, char weakness, float range, float maxMana, float DamageScale){
+    Enemy(Vector2 position, int width, int height, int maxHealth, float health, int power, int value, Texture2D sprite, char weakness, float range, float maxMana, float DamageScale){
         this->position = position;
         this->width = width;
         this->height = height;
@@ -34,7 +34,7 @@ class Enemy{
         this->mana = maxMana;
         this->DamageScale = DamageScale;
     }
-    Enemy(Vector2 position, int width, int height, int maxHealth, int health, int power, int value, Texture2D sprite, char weakness, float range, float maxMana, std::vector<Spell> moves, float DamageScale){
+    Enemy(Vector2 position, int width, int height, int maxHealth, float health, int power, int value, Texture2D sprite, char weakness, float range, float maxMana, std::vector<Spell> moves, float DamageScale){
         this->position = position;
         this->width = width;
         this->height = height;
@@ -51,7 +51,7 @@ class Enemy{
         this->DamageScale = DamageScale;
     }
     
-    void damage(int amount, char weakness){
+    void damage(float amount, char weakness){
     if(this->weakness == weakness) {amount *= 1.5; std::cout << "\n|WEAKNESS|\n";}
         health -= amount;
     }
