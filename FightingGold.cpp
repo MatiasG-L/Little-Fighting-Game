@@ -93,6 +93,8 @@ typedef struct inventory{
  int indexI = 0;
  int indexH = 0;
  
+ int scrollOffset = 275;
+ 
  bool combat = false; 
  bool turn = true;
  Enemy *target;
@@ -186,7 +188,7 @@ int main(void)
     Spell strongHeal('h', 60, 3, 'h', "Strong Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/StrongHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
     Spell superHeal('h', 100, 2, 'h', "Super Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/SuperHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
     Spell fullHeal('h', 10000, 1, 'h', "Full Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/FullHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
-    Spell weakBuffS('b', 0.5, 10, 's', "Weak Strength Buff", '0',/*speed*/ 0, 0, "Sprites/Icons/WeakBuff.png", "Sprites/Icons/Clear.png",0);// creates a buff spell
+    Spell weakBuffS('b', 2, 10, 's', "Weak Strength Buff", '0',/*speed*/ 0, 0, "Sprites/Icons/WeakBuff.png", "Sprites/Icons/Clear.png",0);// creates a buff spell
     Spell weakBuffE('b', 0.5, 10, 'r', "Weak Endurance Buff", '0',/*speed*/ 0, 0, "Sprites/Icons/WeakBuffEnd.png", "Sprites/Icons/Clear.png",0);// creates a buff spell
     
     
@@ -242,6 +244,7 @@ int main(void)
      inventory.spells.push_back(slot14);// adds the created spell to the spells vector in the inventory
      inventory.spells.push_back(slot15);// adds the created spell to the spells vector in the inventory
      inventory.spells.push_back(slot16);// adds the created spell to the spells vector in the inventory
+     
     //creating a vector to be used as a list of moves that can be used as given to an enemy
     std::vector<Spell> dummyMoves = {weakHeal, waterBall, Spike};
     //creating the enemy objects
@@ -423,7 +426,11 @@ int main(void)
        }
        //playermovement when pressing the keys
        
-      
+       if(IsKeyPressed(KEY_UP) && inventoryUI && inventory.spells[inventory.spells.size()-1].position.y > 276){
+           scrollOffset -= 150;
+       }else if(IsKeyPressed(KEY_DOWN) && inventoryUI && inventory.spells[0].position.y < 274){
+           scrollOffset += 150;
+       }else if(!inventoryUI) scrollOffset = 275;
        
        if(!combat){
         if(IsKeyPressed(KEY_D)){
@@ -692,13 +699,13 @@ int main(void)
                 if(!stat){
                 
                 int posX = 260;
-                int posY = 275;
+                int posY = scrollOffset;
                 
                 
                 for(int i =0; i < inventory.spells.size(); ++i){
                     
                     
-                    if(IsMouseButtonPressed(0) && CheckCollisionPointRec({GetMouseX(), GetMouseY()},{inventory.spells[i].position.x, inventory.spells[i].position.y, inventory.spells[i].width, inventory.spells[i].height})){
+                    if(IsMouseButtonPressed(0) && CheckCollisionPointRec({GetMouseX(), GetMouseY()},{inventory.spells[i].position.x, inventory.spells[i].position.y, inventory.spells[i].width, inventory.spells[i].height}) && (inventory.spells[i].position.y < 576 && inventory.spells[i].position.y > 274)){
                         inventoryDragS = true;
                         indexI = i;
                     }
@@ -709,10 +716,13 @@ int main(void)
                         inventory.spells[i].position.y = posY;
                     }
                     
+                    if((inventory.spells[i].position.y < 576 && inventory.spells[i].position.y > 274) || (i == indexI && inventoryDragS)){
                         DrawTexture(inventory.spells[i].spell->texture, inventory.spells[i].position.x, inventory.spells[i].position.y, WHITE);
+                        DrawRectangleLinesEx({inventory.spells[i].position.x, inventory.spells[i].position.y, 100, 100}, inventory.spells[i].thickness, BLACK); 
+                    }
                     
                     
-                    DrawRectangleLinesEx({inventory.spells[i].position.x, inventory.spells[i].position.y, 100, 100}, inventory.spells[i].thickness, BLACK); 
+                    
                     posX += 150;
                     if (posX > 250+(150*8)){
                         posX = 260;
