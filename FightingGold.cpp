@@ -1,10 +1,6 @@
 /**************************************************************************************************************
 *
-*   SQUARED IN REMASTERED IN C++, USING: RAYLIB 5.0
-*
-*   IM SOOO COOL (MISIRABLE)*i think i misspelled that*
-*    
-*   Challange: No tutorials or videos, all logic and gameplay must be original and made by me (raylib documentation *   isnt included) 
+*   COOL LITTLE GAME IN C++, USING: RAYLIB 5.0
 *
 **************************************************************************************************************/
 
@@ -26,6 +22,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <queue>
 
 #include "Wall.h"
 #include "raylib.h"
@@ -34,6 +31,7 @@
 #include "Slot.h"
 #include "projectile.h"
 #include "Enemy.h"
+#include "banner.h"
 
 //macro defined literals that represent predefined velocities in 8 direction that take a single paramater for speed
 #define NORTH(s)  CLITERAL(Vector2){ 0, -s } 
@@ -55,11 +53,13 @@ Player player;// creation the player object
 
 //function that returns a Vector2 for new player position given collision and speed
 Vector2 movementRequestS(char axis, int amountY, Vector2 position);
-//function to handle vector addition because ofc you cant just += them
-Vector2 vectorAddition(Vector2 *a, Vector2 *b);
 //handles spell casting taking a spell as a paramater
+
 void spellCast(Spell spell);
 
+void addSpellBanner(Slot slot);
+void addSpellBanner(Spell spell);
+void addBanner(std::string text);
 
 
 char playerHealth[50];
@@ -73,6 +73,7 @@ std::vector<Wall> walls;
 std::vector<projectile> projectiles;
 std::vector<Spell> spellList;
 std::vector<Enemy> enemies;
+std::vector<banner> itemTemp;
 
 // used to render the level or main menu
 bool inventoryUI = false;
@@ -149,8 +150,8 @@ int main(void)
     PlayerCast.width *= PLAYER_SCALE;
     PlayerCast.height *= PLAYER_SCALE;
     
-    player.walkR = {5, 4, PlayerWalkRight.width, PlayerWalkRight.height, "walkR"};
-    player.walkL = {5, 4, PlayerWalkLeft.width, PlayerWalkLeft.height, "walkL"};
+    player.walkR = {4, 4, PlayerWalkRight.width, PlayerWalkRight.height, "walkR"};
+    player.walkL = {4, 4, PlayerWalkLeft.width, PlayerWalkLeft.height, "walkL"};
     player.idleR = {4, 3, PlayerIdleRight.width, PlayerIdleRight.height, "idle"};
     player.idleL = {4, 3, PlayerIdleLeft.width, PlayerIdleLeft.height, "idle"};
     player.cast = {6, 4, PlayerCast.width, PlayerCast.height, "cast"};
@@ -188,8 +189,24 @@ int main(void)
     Spell strongHeal('h', 60, 3, 'h', "Strong Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/StrongHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
     Spell superHeal('h', 100, 2, 'h', "Super Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/SuperHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
     Spell fullHeal('h', 10000, 1, 'h', "Full Heal", '0',/*speed*/ 0, 0, "Sprites/Icons/FullHeal.png", "Sprites/Icons/Clear.png",0);// creates a healing spell
-    Spell weakBuffS('b', 2, 10, 's', "Weak Strength Buff", '0',/*speed*/ 0, 0, "Sprites/Icons/WeakBuff.png", "Sprites/Icons/Clear.png",0);// creates a buff spell
-    Spell weakBuffE('b', 0.5, 10, 'r', "Weak Endurance Buff", '0',/*speed*/ 0, 0, "Sprites/Icons/WeakBuffEnd.png", "Sprites/Icons/Clear.png",0);// creates a buff spell
+    Spell weakBuffS('b', 0.3, 10, 's', "Weak Strength Buff", '1',/*speed*/ 0, 0, "Sprites/Icons/WeakBuff.png", "Sprites/Icons/Clear.png",0);// creates a buff spell
+    Spell weakBuffE('b', 0.3, 10, 'r', "Weak Endurance Buff", '0',/*speed*/ 0, 0, "Sprites/Icons/WeakBuffEnd.png", "Sprites/Icons/Clear.png",0);// creates a buff spell
+    addSpellBanner(fireBall);
+    addSpellBanner(waterBall);
+    addSpellBanner(lightningBolt);
+    addSpellBanner(Spike);
+    addSpellBanner(lightningSpear);
+    addSpellBanner(waterSpear);
+    addSpellBanner(rock);
+    addSpellBanner(fireArrow);
+    addSpellBanner(weakHeal);
+    addSpellBanner(lightHeal);
+    addSpellBanner(midHeal);
+    addSpellBanner(strongHeal);
+    addSpellBanner(superHeal);
+    addSpellBanner(fullHeal);
+    addSpellBanner(weakBuffS);
+    addSpellBanner(weakBuffE);
     
     
     Slot slot1({0, 0}, 100, 100, &fireBall);
@@ -332,6 +349,7 @@ int main(void)
                     std::swap(projectiles[i], projectiles.back());
                     projectiles.pop_back();
                     
+                    
                 }else if(CheckCollisionRecs({projectiles[i].position.x, projectiles[i].position.y, projectiles[i].width, projectiles[i].height},{player.position.x, player.position.y, player.width, player.height}) && !projectiles[i].freindly){
                     player.position.x += ((player.position.x - midWayPoint(player.position, enemies[j].position).x) * 0.1) * projectiles[i].knockback;
                     player.position.y += ((player.position.y - midWayPoint(player.position, enemies[j].position).y) * 0.1) * projectiles[i].knockback;
@@ -339,6 +357,7 @@ int main(void)
                     //projectiles.erase(projectiles.begin() + i);
                     std::swap(projectiles[i], projectiles.back());
                     projectiles.pop_back();
+                    
                     
                     
                 }
@@ -353,11 +372,17 @@ int main(void)
                     enemies.pop_back();
                     
                     
+                    
                 }
             }
         }
        
-       
+       if(player.lvlnot > 0){
+           for(int i = 0; i < player.lvlnot; i++){
+                addBanner("Player : Leveled Up!");
+           }
+           player.lvlnot = 0;
+       }
        
        if(IsKeyDown(KEY_D) || IsKeyDown(KEY_W) || IsKeyDown(KEY_S) || IsKeyDown(KEY_A)){           
                 if( !player.flipped){
@@ -378,46 +403,46 @@ int main(void)
        
        
        //stamina regeneration
-        if(timerRegen < 0.1){
+        if(timerRegen < 0.05){
             timerRegen += GetFrameTime();
         }else if(player.stamina < player.maxStamina && !IsKeyDown(KEY_LEFT_SHIFT) && !combat){
             player.stamina += 2;
             timerRegen = 0;
         }
          //player movement when holding down the keys
-        if(timerWalk < 0.1){
+        if(timerWalk < 0.05){
            timerWalk += GetFrameTime();
         }else if(!combat){
             if(IsKeyDown(KEY_D) && (!IsKeyDown(KEY_LEFT_SHIFT) || player.stamina <= 0)){
-                player.position = movementRequestS('x', player.stats.agility  * 2 + 15, player.position);
+                player.position = movementRequestS('x', player.stats.agility  * 2 + 5, player.position);
                 player.flipped = false;
                 
             }else if(IsKeyDown(KEY_D) && IsKeyDown(KEY_LEFT_SHIFT) && player.stamina >= 0){
-                player.position = movementRequestS('x', player.stats.agility  * 2 + 30, player.position);
+                player.position = movementRequestS('x', player.stats.agility  * 2 + 10, player.position);
                 player.stamina -= 2;
                 timerRegen = 0;
             }
             if(IsKeyDown(KEY_A) && (!IsKeyDown(KEY_LEFT_SHIFT) || player.stamina <= 0)){
-                player.position = movementRequestS('x', -player.stats.agility  * 2 - 15, player.position);
+                player.position = movementRequestS('x', -player.stats.agility  * 2 - 5, player.position);
                 player.flipped = true;
             }else if(IsKeyDown(KEY_A) && IsKeyDown(KEY_LEFT_SHIFT) && player.stamina >= 0){
-                player.position = movementRequestS('x', -player.stats.agility  * 2 - 30, player.position);
+                player.position = movementRequestS('x', -player.stats.agility  * 2 - 10, player.position);
                 player.stamina -= 2;
                 timerRegen = 0;
             }
             if(IsKeyDown(KEY_W) && (!IsKeyDown(KEY_LEFT_SHIFT) || player.stamina <= 0)){
-                player.position = movementRequestS('y', -player.stats.agility  * 2 - 15, player.position);
+                player.position = movementRequestS('y', -player.stats.agility  * 2 - 5, player.position);
                 
             }else if(IsKeyDown(KEY_W) && IsKeyDown(KEY_LEFT_SHIFT) && player.stamina >= 0){
-                player.position = movementRequestS('y', -player.stats.agility  * 2 - 30, player.position);
+                player.position = movementRequestS('y', -player.stats.agility  * 2 - 10, player.position);
                 player.stamina -= 2;
                 timerRegen = 0;
             }
             if(IsKeyDown(KEY_S) && (!IsKeyDown(KEY_LEFT_SHIFT) || player.stamina <= 0)){
-                player.position = movementRequestS('y', player.stats.agility  * 2 + 15, player.position);
+                player.position = movementRequestS('y', player.stats.agility  * 2 + 5, player.position);
                 
             }else if(IsKeyDown(KEY_S) && IsKeyDown(KEY_LEFT_SHIFT) && player.stamina >= 0){
-                player.position = movementRequestS('y', player.stats.agility  * 2 + 30, player.position);
+                player.position = movementRequestS('y', player.stats.agility  * 2 + 10, player.position);
                 player.stamina -= 2;
                 timerRegen = 0;
             }
@@ -434,32 +459,32 @@ int main(void)
        
        if(!combat){
         if(IsKeyPressed(KEY_D)){
-            player.position = movementRequestS('x', player.stats.agility  * 2 +  15, player.position);
+            player.position = movementRequestS('x', player.stats.agility  * 2 +  5, player.position);
         }
         if(IsKeyPressed(KEY_A)){
-            player.position = movementRequestS('x', -player.stats.agility  * 2 - 15, player.position);
+            player.position = movementRequestS('x', -player.stats.agility  * 2 - 5, player.position);
         }
         if(IsKeyPressed(KEY_W)){
-            player.position = movementRequestS('y', -player.stats.agility  * 2 - 15, player.position);
+            player.position = movementRequestS('y', -player.stats.agility  * 2 - 5, player.position);
         }
         if(IsKeyPressed(KEY_S)){
-            player.position = movementRequestS('y', player.stats.agility  * 2 +  15, player.position);
+            player.position = movementRequestS('y', player.stats.agility  * 2 +  5, player.position);
         }
        }else if(player.stamina >= 10){
             if(IsKeyPressed(KEY_D)){
-                player.position = movementRequestS('x', player.stats.agility  * 2 +  30, player.position);
+                player.position = movementRequestS('x', player.stats.agility  * 2 +  15, player.position);
                 player.stamina -= 10;
             }
             if(IsKeyPressed(KEY_A)){
-                player.position = movementRequestS('x', -player.stats.agility  * 2 - 30, player.position);
+                player.position = movementRequestS('x', -player.stats.agility  * 2 - 15, player.position);
                 player.stamina -= 10;
             }
             if(IsKeyPressed(KEY_W)){
-                player.position = movementRequestS('y', -player.stats.agility  * 2 - 30, player.position);
+                player.position = movementRequestS('y', -player.stats.agility  * 2 - 15, player.position);
                 player.stamina -= 10;
             }
             if(IsKeyPressed(KEY_S)){
-                player.position = movementRequestS('y', player.stats.agility  * 2 +  30, player.position);
+                player.position = movementRequestS('y', player.stats.agility  * 2 + 15, player.position);
                 player.stamina -= 10;
             }
        }
@@ -488,6 +513,7 @@ int main(void)
        
        
        
+       
        if(combat && player.center().x < target->center().x){
            player.flipped = false;
        }
@@ -496,7 +522,7 @@ int main(void)
        }
        
        if(target == NULL){
-          camera.target = {lerp(camera.target.x, player.position.x, 0.5 * GetFrameTime()), lerp(camera.target.y, player.position.y, 0.5 * GetFrameTime())}; 
+          camera.target = {lerp(camera.target.x, player.position.x, 0.7 * GetFrameTime()), lerp(camera.target.y, player.position.y, 0.7 * GetFrameTime())}; 
        }else{
            camera.target = {lerp(camera.target.x, lerp(player.position.x, target->position.x, 0.5), 0.9 * GetFrameTime()), lerp(camera.target.y, lerp(player.position.y, target->position.y, 0.5), 0.9 * GetFrameTime())}; 
        }
@@ -509,8 +535,12 @@ int main(void)
         if(IsKeyPressed(KEY_H)){
             player.updateHealth(10);
         }
-        if(IsKeyPressed(KEY_Q)){
+        if(IsKeyPressed(KEY_E) && !combat){
             inventoryUI = !inventoryUI;
+        }
+        if(IsKeyPressed(KEY_G)){
+            inventory.spells.push_back(slot3);
+            addSpellBanner(slot3);
         }
         if(IsKeyPressed(KEY_P)){
             player.updateStat(2,'m');
@@ -555,17 +585,21 @@ int main(void)
         if(IsKeyPressed(KEY_N)){
             player.exp(10000);
         }
-        if(IsKeyPressed(KEY_E)){
+        if(IsKeyPressed(KEY_E) && combat){
             player.mana = player.maxMana;
             player.stamina = player.maxStamina;
             turn = !turn;
             std::cout<<"\n" << player.damgMultiplier << "\n";
-            if(player.persistance){
+            if(player.persistance){ 
                 player.persistance = false;
             }else{
                 player.damgMultiplier = 1;
                 player.resistanceMultiplier = 1;
             }
+        }
+        if(!combat){
+            player.damgMultiplier = 1;
+            player.resistanceMultiplier = 1;
         }
         
         for(int i = 0; i<projectiles.size(); i++){
@@ -681,6 +715,22 @@ int main(void)
                DrawRectangleLinesEx({50, 200, 180, 40}, 2, BLACK);
                DrawText("Oponents Turn", 60, 210, 20, BLACK);
            }
+           
+           
+           if(itemTemp.size() > 0){
+               for(int i = 0; i < itemTemp.size(); i++){  
+                   char textChar[50];
+                   sprintf(textChar, "%s", itemTemp[i].text.c_str());
+                   DrawRectangle(50, 750 - (i*150), itemTemp[i].width, itemTemp[i].height, CLEARBASE(GRAY,100));
+                   DrawText(textChar, 100, 800 - (i*150), 20, WHITE);
+               }
+               itemTemp.front().decayTimer += GetFrameTime();
+               if(itemTemp.front().decayTimer >= itemTemp.front().decayTime){
+                   itemTemp.erase(itemTemp.begin());
+               }
+               
+           }
+           
            //inventory drawing and draging  
            if(inventoryUI){
                //big rectangle for the backdrop used for opening menu
@@ -1052,6 +1102,21 @@ void spellCast(Spell spell){
     }
     
     
+}
+
+void addSpellBanner(Slot slot){
+    std::string temp = "Spell Acquired: " + slot.spell->name;                
+    banner ban(450, 125,{0,0},2, temp);
+    itemTemp.push_back(ban);
+}
+void addSpellBanner(Spell spell){
+    std::string temp = "Spell Acquired: " + spell.name;                
+    banner ban(450, 125,{0,0},2, temp);
+    itemTemp.push_back(ban);
+}
+void addBanner(std::string text){
+    banner ban (400, 125, {0,0}, 5, text);
+    itemTemp.push_back(ban);
 }
 
 

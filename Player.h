@@ -36,6 +36,7 @@ class Player{
     int EXP = 0;
     int nextLevel = 100;
     int statPoint = 0;
+    int lvlnot = 0;
     
     float damgMultiplier = 1;
     float resistanceMultiplier = 1;
@@ -149,6 +150,7 @@ class Player{
             EXP += amount;
             EXP -= nextLevel;
             level += 1;
+            lvlnot += 1;
             nextLevel *= 1.01;
             statPoint += 1;
             updateStat(1, 'm');

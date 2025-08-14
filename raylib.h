@@ -164,6 +164,7 @@ Rectangle
 // Some Basic Colors
 // NOTE: Custom raylib color palette for amazing visuals on WHITE background
 #define DEFCOLOR(r,g,b,a)  CLITERAL(Color){ r, b, g, a }  
+#define CLEARBASE(C, a) CLITERAL(Color){ C.r, C.b, C.g, a }
 #define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }   // Light Gray
 #define GRAY       CLITERAL(Color){ 130, 130, 130, 255 }   // Gray
 #define DARKGRAY   CLITERAL(Color){ 80, 80, 80, 255 }      // Dark Gray
@@ -187,7 +188,7 @@ Rectangle
 #define DARKBROWN  CLITERAL(Color){ 76, 63, 47, 255 }      // Dark Brown
 
 #define WHITE      CLITERAL(Color){ 255, 255, 255, 255 }    // White
-#define SEMICLEAR      CLITERAL(Color){ 255, 255, 255, 40 }   //Semi-trasperant color 
+#define SEMICLEAR  CLITERAL(Color){ 255, 255, 255, 40 }   //Semi-trasperant color 
 #define BLACK      CLITERAL(Color){ 0, 0, 0, 255 }         // Black
 #define BLANK      CLITERAL(Color){ 0, 0, 0, 0 }           // Blank (Transparent)
 #define MAGENTA    CLITERAL(Color){ 255, 0, 255, 255 }     // Magenta
@@ -210,8 +211,6 @@ Rectangle
 float lerp(float start, float end, float t){
     return start + (end - start) * t;
 }
-
-
 
 template<typename T> T random(T min, T max, float time){
     srand(time + min * max);
